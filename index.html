@@ -1,0 +1,1326 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Штурман</title><meta name="description" content="Игра-навигатор: проверьте на деньги три города Италии для учёбы и получите Паспорт решения"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:wght@500;600;700&family=Fira+Sans:wght@400;600;700&display=swap"><style>[hidden]{display:none!important}html,body{margin:0}img{max-width:100%}:root{color-scheme:light}body{font:14px system-ui}</style><style>
+:root {
+  --ground: #EDF0F2; --card: #F8FAFB; --line: #CBD3D9;
+  --ink: #141A1F; --ink-2: #46525C;
+  --blue: #0B5AA6; --on-blue: #F8FAFB; --blue-tint: #DCE9F5;
+  --green: #0F6B3B; --green-tint: #DDEEE3;
+  --orange: #B9490A; --orange-text: #9E3A0A; --orange-tint: #F8E4D6;
+  --red: #B3262B; --red-tint: #F6DFE0;
+  --slate: #55626D; --slate-tint: #E2E7EA;
+  --yellow: #F2C200; --yellow-text: #5A4500; --yellow-tint: #FBEFB8;
+  --focus: #0B5AA6;
+  --head: 'Fira Sans Condensed', 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif;
+  --body: 'Fira Sans', 'Segoe UI', Roboto, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0F1418; --card: #182027; --line: #2B353D;
+    --ink: #EDF0F2; --ink-2: #A8B4BD;
+    --blue: #6CB0F0; --on-blue: #0F1418; --blue-tint: #14283A;
+    --green: #5FC58A; --green-tint: #173325;
+    --orange: #F29A5C; --orange-text: #F29A5C; --orange-tint: #3A2415;
+    --red: #F28B8E; --red-tint: #3A1C1E;
+    --slate: #9AA7B1; --slate-tint: #252E36;
+    --yellow: #F2C200; --yellow-text: #F2C200; --yellow-tint: #3A3210;
+    --focus: #6CB0F0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0F1418; --card: #182027; --line: #2B353D;
+  --ink: #EDF0F2; --ink-2: #A8B4BD;
+  --blue: #6CB0F0; --on-blue: #0F1418; --blue-tint: #14283A;
+  --green: #5FC58A; --green-tint: #173325;
+  --orange: #F29A5C; --orange-text: #F29A5C; --orange-tint: #3A2415;
+  --red: #F28B8E; --red-tint: #3A1C1E;
+  --slate: #9AA7B1; --slate-tint: #252E36;
+  --yellow: #F2C200; --yellow-text: #F2C200; --yellow-tint: #3A3210;
+  --focus: #6CB0F0;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--ground); color: var(--ink);
+  font-family: var(--body); font-size: 18px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 10; background: var(--ground);
+}
+.app { max-width: 480px; margin: 0 auto; padding-block: 0 48px; min-height: 100vh; display: flex; flex-direction: column; }
+h1, h2, h3 { font-family: var(--head); margin: 0; line-height: 1.12; text-wrap: balance; }
+h1 { font-size: 30px; font-weight: 700; }
+h2 { font-size: 24px; font-weight: 700; }
+h3 { font-size: 20px; font-weight: 600; }
+p { margin: 0; }
+.muted { color: var(--ink-2); }
+.small { font-size: 16px; line-height: 1.4; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.stack-l { display: flex; flex-direction: column; gap: 20px; }
+.row { display: flex; gap: 12px; align-items: center; }
+.row > .grow { flex: 1; min-width: 0; }
+.num { font-family: var(--head); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* шапка */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--ground); padding-block: 12px 12px; display: flex; flex-direction: column; gap: 8px;
+}
+.top-row { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.top-row .label { flex: 1; font-size: 16px; color: var(--ink-2); }
+.prog { display: flex; gap: 4px; }
+.prog span { flex: 1; height: 6px; border-radius: 3px; background: var(--line); }
+.prog span.on { background: var(--blue); }
+.back {
+  min-width: 48px; min-height: 44px; border: 0; background: transparent; color: var(--blue);
+  font: 600 16px/1 var(--body); padding: 0 8px 0 0; cursor: pointer; text-align: left;
+}
+.screen { display: flex; flex-direction: column; gap: 20px; padding-top: 8px; }
+
+/* кнопки */
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+  min-height: 52px; padding: 12px 18px; border-radius: 12px; border: 2px solid var(--blue);
+  background: var(--blue); color: var(--on-blue); font: 600 18px/1.2 var(--body);
+  cursor: pointer; text-align: center; text-decoration: none;
+}
+.btn.sec { background: transparent; color: var(--blue); }
+.btn.link { border-color: transparent; background: transparent; color: var(--blue); min-height: 44px; }
+.btn[disabled] { background: var(--slate-tint); border-color: var(--slate-tint); color: var(--slate); cursor: not-allowed; }
+.btn:active:not([disabled]) { transform: translateY(1px); }
+.btns { display: flex; flex-direction: column; gap: 10px; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 8px; }
+
+/* варианты выбора */
+.opts { display: flex; flex-direction: column; gap: 8px; }
+.opt {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 12px 14px;
+  border-radius: 12px; border: 2px solid var(--line); background: var(--card); color: var(--ink);
+  font: 400 18px/1.3 var(--body); text-align: left; cursor: pointer;
+}
+.opt .mark { width: 22px; height: 22px; flex: none; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 14px; font-weight: 700; }
+.opt.check .mark { border-radius: 6px; }
+.opt[aria-pressed="true"], .opt[aria-checked="true"] { border-color: var(--blue); background: var(--blue-tint); font-weight: 600; }
+.opt[aria-pressed="true"] .mark, .opt[aria-checked="true"] .mark { border-color: var(--blue); background: var(--blue); color: var(--on-blue); }
+.opt .sub { display: block; font-weight: 400; font-size: 16px; color: var(--ink-2); margin-top: 2px; }
+.scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.scale .opt { justify-content: center; padding: 10px 0; font-family: var(--head); font-weight: 700; font-size: 20px; }
+.scale-legend { display: flex; justify-content: space-between; font-size: 16px; color: var(--ink-2); }
+
+/* карточки */
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.card.flat { background: transparent; }
+.signal { display: flex; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.signal .stripe { width: 8px; flex: none; background: var(--yellow); }
+.signal .body { padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.note { background: var(--yellow-tint); color: var(--ink); border-radius: 12px; padding: 12px 14px; font-size: 16px; }
+
+/* табличка города */
+.plate {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  min-width: 52px; height: 38px; padding: 0 8px; border-radius: 8px;
+  background: var(--blue); color: var(--on-blue); box-shadow: inset 0 0 0 2px var(--card);
+  font: 700 20px/1 var(--head); letter-spacing: 1px;
+}
+.plate.lg { min-width: 64px; height: 46px; font-size: 24px; }
+.city { display: flex; align-items: center; gap: 12px; }
+.city .nm { font-family: var(--head); font-weight: 700; font-size: 22px; line-height: 1.1; }
+.city .rg { font-size: 16px; color: var(--ink-2); }
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tile {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px; min-height: 48px;
+  border: 2px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink);
+  font: 400 16px/1.2 var(--body); cursor: pointer; text-align: left;
+}
+.tile[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* статусы */
+.badge { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; border-radius: 8px; padding: 4px 10px; font: 600 16px/1.3 var(--body); }
+.badge.green { background: var(--green-tint); color: var(--green); }
+.badge.orange { background: var(--orange-tint); color: var(--orange-text); }
+.badge.red { background: var(--red-tint); color: var(--red); }
+.badge.slate { background: var(--slate-tint); color: var(--slate); }
+.badge.yellow { background: var(--yellow-tint); color: var(--yellow-text); }
+.badge.blue { background: var(--blue-tint); color: var(--blue); }
+.src { font-size: 16px; color: var(--ink-2); }
+.src a { color: var(--blue); }
+
+/* число-итог */
+.big { font: 700 44px/1 var(--head); font-variant-numeric: tabular-nums; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 10px; display: flex; flex-direction: column; gap: 4px; }
+.kpi .v { font: 700 32px/1 var(--head); }
+.kpi .l { font-size: 16px; line-height: 1.25; color: var(--ink-2); }
+
+/* слайдер */
+.slider { display: flex; flex-direction: column; gap: 6px; }
+.slider-val { font: 700 32px/1 var(--head); color: var(--blue); font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; height: 44px; accent-color: var(--blue); background: transparent; margin: 0; }
+.ends { display: flex; justify-content: space-between; font-size: 16px; color: var(--ink-2); }
+.track { position: relative; height: 54px; margin-top: 4px; }
+.track .bar { position: absolute; left: 0; right: 0; top: 22px; height: 8px; border-radius: 4px; background: var(--line); }
+.track .zero { position: absolute; top: 14px; width: 2px; height: 24px; background: var(--ink-2); }
+.track .mk { position: absolute; top: 10px; width: 6px; height: 32px; border-radius: 3px; margin-left: -3px; transition: left .18s ease-out; }
+.track .mk.you { background: var(--blue); }
+.track .mk.fact { background: var(--ink); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 16px; }
+.legend i { display: inline-block; width: 6px; height: 16px; border-radius: 3px; margin-right: 6px; vertical-align: -2px; }
+
+/* списки */
+.list { display: flex; flex-direction: column; }
+.list .li { display: flex; gap: 12px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.list .li:last-child { border-bottom: 0; }
+.list .li .k { flex: 1; min-width: 0; }
+details.more { border-top: 1px solid var(--line); padding-top: 10px; }
+details.more summary { cursor: pointer; color: var(--blue); font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+textarea { width: 100%; min-height: 96px; padding: 12px; border-radius: 12px; border: 2px solid var(--line); background: var(--card); color: var(--ink); font: 400 18px/1.4 var(--body); resize: vertical; }
+textarea:focus { border-color: var(--blue); }
+.passport { background: var(--card); border: 2px solid var(--ink); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.passport .hd { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; border-bottom: 2px solid var(--ink); padding-bottom: 10px; }
+.passport .sec h3 { font-size: 18px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-2); margin-bottom: 6px; }
+.code { font: 700 18px/1.4 'Fira Sans Condensed', monospace; letter-spacing: 1px; word-break: break-all; background: var(--slate-tint); border-radius: 8px; padding: 8px 10px; }
+.copybox { width: 100%; min-height: 160px; font-size: 16px; }
+.toast { min-height: 24px; font-size: 16px; color: var(--green); font-weight: 600; }
+
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.hero-signs { display: flex; gap: 8px; flex-wrap: wrap; }
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+  .btn:active:not([disabled]) { transform: none; }
+}
+@media (min-width: 720px) {
+  body { font-size: 18px; }
+  .app { padding-top: 24px; }
+}
+
+/* ===== v1.0: игровой слой ===== */
+.title { font-size: 44px; letter-spacing: .5px; }
+.lead { font-size: 18px; line-height: 1.5; color: var(--ink); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font: 600 18px/1.3 var(--body); }
+.field input {
+  width: 100%; min-height: 52px; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--line);
+  background: var(--card); color: var(--ink); font: 400 18px/1.3 var(--body);
+}
+.field input:focus { border-color: var(--blue); outline: none; }
+.ib {
+  display: inline-grid; place-items: center; width: 18px; height: 18px; margin: 0 1px 0 2px; padding: 0;
+  border-radius: 50%; border: 1.5px solid var(--blue); background: var(--card); color: var(--blue);
+  font: 700 12px/1 var(--head); font-style: italic; vertical-align: super; cursor: pointer; position: relative;
+}
+.ib::after { content: ""; position: absolute; inset: -10px; }
+.top-row .score {
+  display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px;
+  background: var(--yellow); color: #141A1F; font: 700 16px/1.2 var(--head); white-space: nowrap;
+}
+.roadbar { position: relative; height: 22px; display: flex; justify-content: space-between; align-items: center; margin: 2px 10px 0; }
+.roadbar .lane { position: absolute; left: 0; right: 0; top: 9px; height: 4px; border-radius: 2px; background: repeating-linear-gradient(90deg, var(--line) 0 10px, transparent 10px 16px); }
+.roadbar .ms { position: relative; width: 12px; height: 12px; border-radius: 50%; background: var(--ground); border: 2px solid var(--line); }
+.roadbar .ms.done { background: var(--blue); border-color: var(--blue); }
+.roadbar .ms.cur { border-color: var(--blue); }
+.roadbar .car { position: absolute; top: -6px; color: var(--blue); transition: left .35s ease-out; }
+.chip {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+  background: var(--ink); color: var(--ground); font: 700 16px/1.2 var(--head); padding: 10px 16px; border-radius: 999px;
+}
+.map { width: 100%; height: auto; display: block; }
+.map .sea { fill: var(--blue-tint); }
+.map .land { fill: var(--card); stroke: var(--line); stroke-width: 1.2; }
+.map .road { fill: none; stroke: var(--blue); stroke-width: 3; stroke-dasharray: 6 5; stroke-linecap: round; }
+.map .dot { fill: var(--slate); }
+.map .pl rect { fill: var(--card); stroke: var(--line); stroke-width: 1; }
+.map .pl text { fill: var(--ink-2); font: 700 13px var(--head); }
+.map .pl.on .dot { fill: var(--ink); }
+.map .pl.on rect { fill: var(--blue); stroke: var(--card); stroke-width: 1.5; }
+.map .pl.on text { fill: var(--on-blue); }
+.map .pl.main rect { stroke: var(--yellow); stroke-width: 3; }
+.map .pl text.bal { fill: var(--ink); font: 700 12px var(--head); }
+.map [role="button"] { cursor: pointer; }
+.map [role="button"]:focus-visible rect { stroke: var(--focus); stroke-width: 3; }
+.legs { display: flex; flex-direction: column; gap: 10px; position: relative; padding-left: 4px; }
+.leg { display: flex; gap: 12px; align-items: flex-start; }
+.legn { width: 30px; height: 30px; flex: none; border-radius: 8px; display: grid; place-items: center; background: var(--blue); color: var(--on-blue); font: 700 16px/1 var(--head); }
+.tank { position: relative; height: 18px; border-radius: 9px; background: var(--blue); overflow: hidden; }
+.tank .rent { position: absolute; left: 0; top: 0; bottom: 0; background: repeating-linear-gradient(45deg, var(--orange) 0 6px, var(--orange-tint) 6px 10px); }
+.tank-leg { display: flex; justify-content: space-between; color: var(--ink-2); }
+.plate.sm { min-width: 40px; height: 28px; font-size: 16px; }
+.btn.mini { width: auto; min-height: 44px; padding: 8px 10px; }
+.card.sch.on { border-color: var(--blue); box-shadow: inset 0 0 0 1px var(--blue); }
+.signal .stripe { width: 30px; display: flex; justify-content: center; padding-top: 16px; font: 700 18px/1 var(--head); color: #141A1F; }
+.row > .btn { flex: 1; }
+.list .li .r { text-align: right; max-width: 60%; }
+.finish { display: flex; flex-direction: column; gap: 14px; padding: 20px 16px; border-radius: 16px; background: var(--card); border: 2px solid var(--blue); }
+.eyebrow { font: 700 14px/1 var(--head); letter-spacing: 2px; text-transform: uppercase; color: var(--blue); }
+.rankrow { display: flex; align-items: center; gap: 14px; }
+.bignum { font: 700 72px/0.9 var(--head); font-variant-numeric: tabular-nums; color: var(--blue); }
+.rank { font: 700 22px/1.2 var(--head); }
+.parts { display: flex; flex-direction: column; gap: 8px; }
+.part { display: grid; grid-template-columns: 1fr 90px 48px; gap: 8px; align-items: center; font-size: 16px; }
+.pbar { height: 10px; border-radius: 5px; background: var(--line); overflow: hidden; }
+.pbar i { display: block; height: 100%; background: var(--blue); border-radius: 5px; }
+.pv { text-align: right; font: 700 16px/1 var(--head); font-variant-numeric: tabular-nums; }
+.badges { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bdg { display: flex; gap: 8px; align-items: flex-start; padding: 10px; border-radius: 12px; border: 1px dashed var(--line); color: var(--ink-2); font-size: 15px; line-height: 1.3; }
+.bdg .bi { width: 30px; height: 30px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--slate-tint); color: var(--slate); font: 700 16px/1 var(--head); }
+.bdg .sub { display: block; font-size: 14px; }
+.bdg.got { border: 1px solid var(--green); color: var(--ink); background: var(--green-tint); }
+.bdg.got .bi { background: var(--green); color: var(--card); }
+#sheet-root { position: fixed; inset: 0; z-index: 40; }
+.scrim { position: absolute; inset: 0; background: rgba(15, 20, 24, .5); }
+.sheet {
+  position: absolute; left: 0; right: 0; bottom: 0; max-height: 85vh; overflow: auto; margin: 0 auto; max-width: 520px;
+  background: var(--ground); border-radius: 18px 18px 0 0; padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  display: flex; flex-direction: column; gap: 12px;
+}
+.sheet-hd { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.sheet-bd { display: flex; flex-direction: column; gap: 12px; }
+.x { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--slate-tint); color: var(--ink); font-size: 18px; cursor: pointer; flex: none; }
+.pimg { width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+@media (prefers-reduced-motion: reduce) { .roadbar .car { transition: none; } }
+
+.nw { white-space: nowrap; }
+.city .grow { flex: 1; min-width: 0; }
+.big { white-space: nowrap; }
+
+.docrow { display: flex; flex-direction: column; gap: 4px; }
+.terms { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding-left: 14px; font-size: 15px; color: var(--ink-2); }
+.tl { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 2px 8px; border: 0; border-radius: 8px; background: transparent; color: var(--blue); font: 600 15px/1.2 var(--body); cursor: pointer; }
+.tl:hover { background: var(--blue-tint); }
+.tli { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--blue); font: 700 11px/1 var(--head); font-style: italic; }
+</style><script src="config.js"></script></head><body>
+<main id="app" class="app"><noscript>Для игры нужен JavaScript.</noscript></main>
+<div id="sheet-root" hidden></div>
+<div id="chip" class="chip" role="status" aria-live="polite" hidden></div>
+<script>
+/* ===== ДАННЫЕ ИГРЫ =====
+   Источник: файл эксперта «Выбор города и деньги на учёбу» (20.10.2026), реестр источников И1–И42.
+   Править можно без знания кода: тексты в кавычках, числа без кавычек. */
+const DATA = {
+  version: "1.1-test",
+  gameUrl: "https://claude.ai/artifact/T3n5155FwTCZqEHZyuRLLg",
+  checkedAt: "20.10.2026",
+  dsuMonth: 597.59,          // минимум DSU fuori sede 2026/27: 7 171,11 € в год / 12 (И7)
+  dsuYear: "7 171 €",
+
+  contact: {
+    name: "Андрей Рюмин",
+    nameWith: "Андреем Рюминым",
+    tg: "arryum",
+    url: "https://t.me/arryum",
+    where: "в Telegram"
+  },
+
+  cities: [
+    { code: "MI", lon: 9.19, lat: 45.46, lx: -12, ly: -30, name: "Милан", loc: "Милане",     region: "Ломбардия",      rent: 704, rentSrc: "И1", dsu: "n", dsuNote: "Покрытие неполное: часть студентов, прошедших по критериям, остаётся без выплаты.", dsuSrc: "И18", unis: "PoliMi, Statale, Bicocca, Bocconi (частный)", strong: "инженерия, дизайн, экономика", eng: 5, size: "Мегаполис", sizeK: 3, note: "Самая дорогая аренда в Италии; комнат на рынке за год стало на 31,5% меньше." },
+    { code: "FI", lon: 11.25, lat: 43.77, lx: 6, ly: 2, name: "Флоренция", loc: "Флоренции", region: "Тоскана",        rent: 627, rentSrc: "И1", dsu: "g", dsuNote: "Тоскана гарантировала все стипендии 2025/26.", dsuSrc: "И14", unis: "UniFi", strong: "архитектура, дизайн, искусство", eng: 3, size: "Средний", sizeK: 2, note: "Вторая по дороговизне аренда после Милана, +46% с 2020 года." },
+    { code: "RM", lon: 12.5, lat: 41.9, lx: -40, ly: -4, name: "Рим", loc: "Риме",       region: "Лацио",          rent: 615, rentSrc: "И1", dsu: "g", dsuNote: "Стипендию 2025/26 получили все, кто прошёл по критериям, но только в апреле 2026.", dsuSrc: "И10", unis: "Sapienza, Tor Vergata, LUISS (частный)", strong: "все направления", eng: 4, size: "Мегаполис", sizeK: 3, note: "Аренда +7% за год." },
+    { code: "BO", lon: 11.34, lat: 44.49, lx: 6, ly: -8, name: "Болонья", loc: "Болонье",   region: "Эмилия-Романья", rent: 585, rentSrc: "И1", dsu: "g", dsuNote: "Регион подтвердил полное покрытие стипендий 2025/26.", dsuSrc: "И11", unis: "UniBo", strong: "гуманитарные, экономика, медицина", eng: 4, size: "Средний", sizeK: 2, note: "Главная проблема не цена, а наличие: комнат на рынке на 23,5% меньше, чем год назад." },
+    { code: "PD", lon: 11.88, lat: 45.41, lx: 6, ly: -6, name: "Падова", loc: "Падове",    region: "Венето",         rent: 495, rentSrc: "И1", dsu: "d", dsuNote: "Полное покрытие заявлено регионом; данных о фактических выплатах нет.", dsuSrc: "И12", unis: "UniPd", strong: "медицина, психология, инженерия", eng: 4, size: "Средний", sizeK: 2, note: "По оценке Censis 2026/27 — в тройке лучших по цене и качеству." },
+    { code: "TO", lon: 7.69, lat: 45.07, lx: -40, ly: -4, name: "Турин", loc: "Турине",     region: "Пьемонт",        rent: 479, rentSrc: "И1", dsu: "g", dsuNote: "Регион платит стипендию всем, кто прошёл по критериям (2025/26).", dsuSrc: "И9", unis: "PoliTo, UniTo", strong: "инженерия, автомобили, IT", eng: 4, size: "Большой", sizeK: 3, note: "По оценке Censis 2026/27 — в тройке лучших по цене и качеству." },
+    { code: "TN", lon: 11.12, lat: 46.07, lx: 6, ly: -24, name: "Тренто", loc: "Тренто",    region: "Трентино",       rent: 444, rentSrc: "И3", dsu: "n", dsuNote: "Провинция ставит цель платить всем; фактический процент выплат не опубликован.", dsuSrc: "И16", unis: "UniTn", strong: "IT, когнитивные науки", eng: 3, size: "Маленький", sizeK: 1, note: "Своего аэропорта нет." },
+    { code: "GE", lon: 8.95, lat: 44.41, lx: -40, ly: 2, name: "Генуя", loc: "Генуе",     region: "Лигурия",        rent: 408, rentSrc: "И1", dsu: "g", dsuNote: "В 2025/26 стипендию получили 100% подавших заявку.", dsuSrc: "И15", unis: "UniGe", strong: "инженерия, морское дело", eng: 2, size: "Средний", sizeK: 2, note: "Комнат на рынке за год стало на 44,5% больше." },
+    { code: "PV", lon: 9.16, lat: 45.19, lx: -40, ly: 4, name: "Павия", loc: "Павии",     region: "Ломбардия",      rent: 400, rentSrc: "И4", dsu: "n", dsuNote: "Покрытие неполное, как во всей Ломбардии.", dsuSrc: "И18", unis: "UniPv", strong: "медицина на английском", eng: 3, size: "Маленький", sizeK: 1, note: "30 минут до Милана; коллегии дают дешёвое жильё." },
+    { code: "PI", lon: 10.4, lat: 43.72, lx: -40, ly: 2, name: "Пиза", loc: "Пизе",      region: "Тоскана",        rent: 364, rentSrc: "И2", dsu: "g", dsuNote: "Тоскана гарантировала все стипендии 2025/26.", dsuSrc: "И14", unis: "UniPi, Scuola Normale, Sant'Anna", strong: "IT, инженерия, физика", eng: 3, size: "Маленький", sizeK: 1, note: "По оценке Censis 2026/27 — в тройке лучших по цене и качеству." },
+    { code: "PG", lon: 12.39, lat: 43.11, lx: 6, ly: 2, name: "Перуджа", loc: "Перудже",   region: "Умбрия",         rent: 300, rentSrc: "И5", dsu: "n", dsuNote: "Выплаты в пределах выделенных средств; процент покрытия не публикуется.", dsuSrc: "И17", unis: "UniPg, Università per Stranieri", strong: "итальянский язык, подготовительный год", eng: 1, size: "Маленький", sizeK: 1, note: "Università per Stranieri подходит для языкового года перед поступлением." },
+    { code: "ME", lon: 15.55, lat: 38.19, lx: 6, ly: -24, name: "Мессина", loc: "Мессине",   region: "Сицилия",        rent: 284, rentSrc: "И6", dsu: "g", dsuNote: "Регион профинансировал всех прошедших по критериям в 2025/26; выплаты — в конце учебного года.", dsuSrc: "И13", unis: "UniMe", strong: "медицина (IMAT), бизнес, биология", eng: 3, size: "Средний", sizeK: 2, note: "Есть подготовительный Foundation Course на английском." }
+  ],
+
+  // Контур Италии для схемы маршрута (упрощённый, долгота/широта)
+  outline: [
+    [[7.0,45.9],[6.9,45.1],[7.0,44.2],[7.6,43.8],[8.2,43.9],[8.9,44.4],[9.6,44.1],[10.2,43.9],[10.3,43.5],[10.6,42.9],[11.1,42.4],[11.8,42.1],[12.3,41.7],[13.0,41.25],[13.9,41.0],[14.2,40.8],[14.9,40.3],[15.0,40.0],[15.7,39.5],[16.0,38.9],[15.65,38.0],[16.1,37.9],[16.6,38.4],[17.1,38.9],[16.5,39.6],[16.9,40.3],[17.2,40.47],[18.0,40.0],[18.37,39.8],[18.5,40.15],[17.95,40.64],[16.87,41.13],[15.9,41.6],[16.2,41.9],[15.0,42.0],[14.2,42.47],[13.5,43.6],[12.57,44.06],[12.3,44.4],[12.5,44.9],[12.3,45.4],[13.1,45.7],[13.8,45.65],[13.7,46.5],[12.4,47.0],[11.0,46.9],[10.5,46.6],[9.3,46.5],[8.4,46.4],[7.0,45.9]],
+    [[15.65,38.27],[15.1,37.5],[15.1,36.7],[14.0,37.1],[12.5,37.6],[12.7,38.1],[13.4,38.2],[14.5,38.05],[15.65,38.27]],
+    [[8.2,41.1],[9.2,41.25],[9.6,41.1],[9.8,40.2],[9.6,39.1],[8.6,38.9],[8.4,39.7],[8.5,40.6],[8.2,41.1]]
+  ],
+
+  // Словарь: значок «i» рядом со словом открывает пояснение
+  glossary: {
+    "DSU": "Diritto allo Studio Universitario, «право на учёбу». Региональная поддержка студентов в Италии: стипендия, освобождение от платы за учёбу, иногда общежитие и питание. Назначается по доходу семьи и успеваемости, иностранцам тоже.",
+    "ISEE": "Показатель экономического положения семьи в Италии. По нему решают, положена ли стипендия DSU и сколько платить за учёбу.",
+    "ISEE parificato": "Вариант ISEE для иностранцев, чья семья живёт за рубежом. Считается по документам о доходах и имуществе семьи из вашей страны — с апостилем и переводом на итальянский.",
+    "MAECI": "Министерство иностранных дел Италии. Даёт государственные стипендии иностранцам, в том числе на магистратуру.",
+    "AFAM": "Высшее художественное и музыкальное образование Италии: академии художеств, консерватории, институты дизайна.",
+    "PhD": "Аспирантура: программа подготовки исследователей после магистратуры.",
+    "Universitaly": "Официальный портал Министерства университетов Италии. Через него иностранцы подают предварительную заявку на программу — без неё не дают студенческую визу.",
+    "Dichiarazione di valore": "Справка итальянского консульства о том, чему соответствует ваш аттестат или диплом в итальянской системе образования.",
+    "CIMEA": "Итальянский центр признания дипломов. Его сертификат многие вузы принимают вместо Dichiarazione di valore.",
+    "апостиль": "Штамп, который заверяет документ для использования за границей. Ставится в стране, где документ выдан.",
+    "permesso di soggiorno": "Вид на жительство в Италии. Студент подаёт на него после въезда по учебной визе.",
+    "codice fiscale": "Итальянский налоговый код. Нужен для договора аренды, банковского счёта и сим-карты.",
+    "виза типа D": "Национальная долгосрочная виза Италии для учёбы дольше 90 дней.",
+    "GRE": "Международный экзамен для поступления в магистратуру: математика, логика, английский.",
+    "IMAT": "Вступительный экзамен на программы медицины на английском в государственных вузах Италии.",
+    "Erasmus Mundus": "Программа ЕС: совместные магистратуры в двух-трёх странах со стипендией, которая покрывает плату за учёбу и жизнь.",
+    "коллегия di merito": "Студенческая резиденция, куда принимают по конкурсу заслуг. Жильё обычно дешевле рынка, внутри — занятия и сообщество.",
+    "Censis": "Итальянский исследовательский институт, который каждый год составляет рейтинг университетов.",
+    "Foundation Course": "Подготовительный год для тех, кому не хватает лет школьного образования: в Италии школа длится 13 лет, а во многих странах СНГ — 11.",
+    "Invest Your Talent": "Программа МИД Италии и вузов-партнёров: стипендия на магистратуру на английском с обязательной стажировкой в компании.",
+    "баланс": "Сколько остаётся от минимальной стипендии DSU (597,59 € в месяц) после оплаты средней комнаты в городе. Еда, транспорт и страховка сюда не входят.",
+    "fuori sede": "Студент, который учится не в своём городе и снимает жильё. Для таких студентов стипендия DSU самая большая."
+  },
+
+  // Направления → ключевые слова в поле strong
+  fields: [
+    { id: "eng", label: "Инженерия и IT", keys: ["инженер", "it", "физик", "автомоб"] },
+    { id: "eco", label: "Экономика и бизнес", keys: ["эконом", "бизнес"] },
+    { id: "des", label: "Дизайн и архитектура", keys: ["дизайн", "архитект", "искусств"] },
+    { id: "med", label: "Медицина и биология", keys: ["медицин", "биолог", "психолог"] },
+    { id: "hum", label: "Гуманитарные науки и язык", keys: ["гуманитар", "язык", "когнитив"] },
+    { id: "any", label: "Пока не решил(а)", keys: [] }
+  ],
+
+  // cit: yes — доступ подтверждён; no — закрыто; check — проверить; none — ограничений в тексте не указано
+  // levels: bach, mag, any
+  scholarships: [
+    { id: "dsu", name: "Региональная стипендия DSU", by: "Региональное агентство DSU", levels: ["any"], cities: ["*"], amount: "от 7 171 € в год, обычно с освобождением от платы", cond: "Нужен пакет документов о доходах семьи с апостилем и переводом (ISEE parificato). Выплата зависит от региона.", cit: { RU: "yes", KZ: "yes", BY: "yes" }, deadline: "Лето; например, в Пьемонте — до 04.09.2026", next: "ожидается летом 2027", soon: false, src: "И7, И36" },
+    { id: "maeci", name: "Стипендия правительства Италии (MAECI)", by: "МИД Италии", levels: ["mag"], cities: ["*"], amount: "около 1 200 € в месяц (10 800 € за 9 месяцев) и страховка", cond: "Магистратура, AFAM или PhD. Для магистратуры — до 28 лет. Бакалавриат не входит.", cit: { RU: "yes", KZ: "check", BY: "check" }, ageMax: 28, deadline: "26.03.2026", next: "ожидается в марте 2027", soon: false, src: "И20, И21" },
+    { id: "iyt", name: "Invest Your Talent in Italy", by: "МИД Италии и вузы-партнёры", levels: ["mag"], cities: ["*"], amount: "около 1 200 € в месяц, стажировка обязательна", cond: "Магистратура на английском: инженерия, архитектура и дизайн, экономика. В конкурсе 2026 — рождённые не раньше 01.01.2000. Открыта только для 23 стран из списка.", cit: { RU: "no", KZ: "yes", BY: "no" }, ageIYT: true, deadline: "11.05.2026", next: "ожидается в мае 2027", soon: false, src: "И22, И23" },
+    { id: "pmplat", name: "PoliMi Platinum", by: "Politecnico di Milano", levels: ["mag"], cities: ["MI"], amount: "10 000 € в год и освобождение от платы (10 стипендий)", cond: "Магистратура на английском. Нужна заявка на поступление в раннем окне. Страна происхождения — один из критериев оценки.", cit: { RU: "none", KZ: "none", BY: "none" }, deadline: "15.12.2025", next: "ожидается к декабрю 2026", soon: true, src: "И24" },
+    { id: "pmgold", name: "PoliMi Gold", by: "Politecnico di Milano", levels: ["mag"], cities: ["MI"], amount: "8 000 € в год и освобождение от платы (18 стипендий)", cond: "Как Platinum: магистратура на английском, ранняя заявка на поступление.", cit: { RU: "none", KZ: "none", BY: "none" }, deadline: "15.12.2025", next: "ожидается к декабрю 2026", soon: true, src: "И24" },
+    { id: "pmsilv", name: "PoliMi Silver", by: "Politecnico di Milano", levels: ["mag"], cities: ["MI"], amount: "только освобождение от платы (10 стипендий)", cond: "Магистратура на английском в кампусах Кремоны, Лекко, Мантуи и Пьяченцы, не в самом Милане.", cit: { RU: "none", KZ: "none", BY: "none" }, deadline: "15.12.2025", next: "ожидается к декабрю 2026", soon: true, src: "И24" },
+    { id: "padua", name: "Padua International Excellence", by: "Università di Padova", levels: ["bach", "mag"], cities: ["PD"], amount: "8 000 € в год и освобождение от платы (до 76 стипендий)", cond: "Программы на английском. Нельзя жить в Италии на момент подачи; нужен зарубежный диплом.", cit: { RU: "none", KZ: "none", BY: "none" }, deadline: "конкурс 2027/28 — в ноябре 2026", next: "ноябрь 2026", soon: true, src: "И25" },
+    { id: "unibo", name: "International Talents @Unibo", by: "Università di Bologna", levels: ["mag"], cities: ["BO"], amount: "6 500 € в год на 2 года (30 стипендий)", cond: "Обязателен GRE, доход семьи (ISEE) 16–35 тыс. €, возраст до 30 лет.", cit: { RU: "none", KZ: "none", BY: "none" }, ageMax: 30, deadline: "30.05.2025 (конкурс 2026/27 не найден)", next: "срок не известен", soon: false, src: "И26" },
+    { id: "topolito", name: "TOPoliTO", by: "Politecnico di Torino", levels: ["bach", "mag"], cities: ["TO"], amount: "8 000 € в год", cond: "Условия — в тексте конкурса, его надо прочитать самостоятельно.", cit: { RU: "check", KZ: "check", BY: "check" }, deadline: "нет данных", next: "срок не известен", soon: false, src: "И27" },
+    { id: "unito", name: "Talents 4 UniTo", by: "Università di Torino", levels: ["mag"], cities: ["TO"], amount: "20 000 € за 2 года (40 стипендий)", cond: "Магистратура на английском. Доступ по гражданству в тексте не проверен.", cit: { RU: "check", KZ: "check", BY: "check" }, deadline: "конкурс 2026/27 закрыт, рейтинг 17.06.2026", next: "срок не известен", soon: false, src: "И28" },
+    { id: "sapienza", name: "Sapienza «Wanted the best»", by: "Sapienza, Рим", levels: ["mag"], cities: ["RM"], amount: "3 000 € в год на 2 года (85 стипендий)", cond: "Только для выпускников другого итальянского вуза; оценка за диплом от 105 из 110.", cit: { RU: "none", KZ: "none", BY: "none" }, needItDiploma: true, deadline: "30.10.2026", next: "срок 30.10.2026", soon: false, src: "И29" },
+    { id: "pvwaiver", name: "Fee Waiver Programme (Павия)", by: "Università di Pavia", levels: ["bach", "mag"], cities: ["PV"], amount: "освобождение от платы за первый год", cond: "Назначается автоматически; критерии в прочитанном тексте не раскрыты.", cit: { RU: "check", KZ: "check", BY: "check" }, deadline: "назначается автоматически", next: "автоматически", soon: false, src: "И30" },
+    { id: "trento", name: "Стипендии School of International Studies", by: "Università di Trento", levels: ["mag"], cities: ["TN"], amount: "7 200 € в год (4 стипендии)", cond: "Магистратуры MISS и MEIS. Частичное освобождение от платы получает более широкий круг студентов.", cit: { RU: "none", KZ: "none", BY: "none" }, deadline: "03.04.2026", next: "ожидается в апреле 2027", soon: false, src: "И32" },
+    { id: "strapg", name: "Стипендия Università per Stranieri", by: "Università per Stranieri di Perugia", levels: ["any"], cities: ["PG"], amount: "500 € в месяц и бесплатный курс итальянского", cond: "Только курсы итальянского, очно в Перудже. Нужно уже учить итальянский. Деньги выдают в банке в Перудже.", cit: { RU: "none", KZ: "none", BY: "none" }, deadline: "нет данных", next: "срок не известен", soon: false, src: "И33" },
+    { id: "italofonia", name: "MAECI Italofonia", by: "МИД Италии", levels: ["any"], cities: ["*"], amount: "3 600 € единоразово за трёхмесячный интенсив итальянского", cond: "Нужен итальянский не ниже A2.", cit: { RU: "yes", KZ: "check", BY: "check" }, deadline: "26.03.2026", next: "ожидается в марте 2027", soon: false, src: "И20" },
+    { id: "erasmus", name: "Erasmus Mundus Joint Masters", by: "Евросоюз, консорциумы вузов", levels: ["mag"], cities: ["*"], amount: "около 1 400 € в месяц до 24 месяцев, плата за учёбу включена", cond: "Совместная магистратура в 2–3 странах. У каждой программы свой срок. Данные о доступе для РФ — за 2022 год.", cit: { RU: "yes", KZ: "yes", BY: "check" }, deadline: "осень–зима, у каждой программы свой", next: "осень–зима 2026/27", soon: false, src: "И34, И42" },
+    { id: "collegi", name: "Место в коллегии di merito (Павия)", by: "Коллегии Павии", levels: ["any"], cities: ["PV"], amount: "место в коллегии по конкурсу", cond: "Стоимость и доступность для иностранцев на странице вуза не указаны.", cit: { RU: "check", KZ: "check", BY: "check" }, deadline: "лето, у каждой коллегии свой конкурс", next: "ожидается летом 2027", soon: false, src: "И38" },
+    { id: "bocconi", name: "Скидка 60–80% в Bocconi", by: "Università Bocconi", levels: ["bach"], cities: ["MI"], amount: "скидка 60–80% от платы за учёбу", cond: "Бакалавриат и право. По доходу семьи, пока есть средства. Bocconi — частный вуз с высокой платой.", cit: { RU: "none", KZ: "none", BY: "none" }, deadline: "единая заявка Bocconi4Access", next: "по графику приёма", soon: false, src: "И39" }
+  ],
+
+  // ЧЕРНОВИК: перечень проверяет и обновляет Андрей Рюмин
+  docsReviewed: false,
+  docs: [
+    { id: "pass", text: "Загранпаспорт" },
+    { id: "dipl", text: "Аттестат или диплом с приложением" },
+    { id: "recog", text: "Признание документа об образовании: Dichiarazione di valore или сертификат CIMEA" },
+    { id: "lang", text: "Языковой сертификат, если его требует программа" },
+    { id: "univ", text: "Предварительная заявка на портале Universitaly" },
+    { id: "money", text: "Подтверждение средств на проживание для визы" },
+    { id: "ins", text: "Медицинская страховка" },
+    { id: "isee", text: "Пакет документов о доходах семьи для DSU: около 11 документов с апостилем и переводом" },
+    { id: "visa", text: "Студенческая виза типа D" },
+    { id: "after", text: "После въезда: вид на жительство (permesso di soggiorno) и налоговый код (codice fiscale)" }
+  ],
+
+  sources: {
+    "И1": ["AGI по данным Immobiliare.it: аренда комнат для студентов, 12.08.2026", "https://www.agi.it/economia/news/2026-08-12/affitto-stanze-studenti-38483571/"],
+    "И2": ["Money.it: аренда для студентов по городам, 03.09.2026", "https://www.money.it/affitti-per-studenti-quanto-costa-una-stanza-nel-2026"],
+    "И3": ["ItaliaOggi: Падова, Пиза и Турин — лучшие по цене и качеству", "https://www.italiaoggi.it/economia-e-politica/attualita/universita-e-caro-affitti-padova-pisa-e-torino-le-migliori-per-qualita-prezzo-iqugfk35"],
+    "И4": ["Il Giorno: аренда в Ломбардии, 13.08.2026", "https://www.ilgiorno.it/cronaca/affitto-stanza-universitari-costi-lombardia-yuoo6p73"],
+    "И5": ["Umbria24: аренда в Перудже, 29.04.2026", "https://www.umbria24.it/attualita/affitti-universitari-a-perugia-una-stanza-singola-costa-il-35-in-piu-in-sei-anni/"],
+    "И6": ["QdS: аренда для студентов, март 2026", "https://risorgimentosicilia.qds.it/economia/affitti-studenti-2026-stanze-singole-aumento-universita-italiane/"],
+    "И7": ["Tesify: стипендии DSU 2026/27 (по декрету MUR)", "https://tesify.it/blog/borse-studio-universita-italia-2026-dsu-edisu-ardsu"],
+    "И9": ["Regione Piemonte: 100% стипендий 2025/26", "https://www.regione.piemonte.it/web/pinforma/notizie/confermato-limpegno-garantire-100-delle-borse-studio-universitarie-2025-26"],
+    "И10": ["Regione Lazio: все прошедшие 2025/26 получили стипендию, 28.04.2026", "https://regione.lazio.it/notizie/Borse-studio-2025-2026-scorre-graduatoria-dichiarati-vincitori-tutti-studenti-idonei"],
+    "И11": ["Bologna2000: Эмилия-Романья, 100% стипендий 2025/26", "https://www.bologna2000.com/2026/05/08/borse-di-studio-universitarie-in-emilia-romagna-centrato-lobiettivo-del-100-per-lanno-accademico-2025-26/"],
+    "И12": ["Rovigo.News: Венето, полное покрытие 2025/26", "https://www.rovigo.news/borse-di-studio-2025-2026-18-milioni-dalla-regione-per-la-copertura-integrale/"],
+    "И13": ["Regione Siciliana: оплата 100% стипендий, 28.04.2026", "https://www.regione.sicilia.it/la-regione-informa/universita-al-pagamenti-100-borse-studio-34785-studenti-idonei"],
+    "И14": ["Gazzetta di Siena: Тоскана гарантирует все стипендии", "https://www.gazzettadisiena.it/diritto-allo-studio-la-toscana-non-si-ferma-garantite-tutte-le-borse-nonostante-i-tagli/"],
+    "И15": ["LiguriaDay: стипендии Лигурии 2025/26", "https://liguriaday.it/2025/11/10/quasi-5-000-borse-di-studio-universitarie-da-regione-liguria-per-il-2025-2026/"],
+    "И16": ["L'Adige: стипендии в Трентино", "https://www.ladige.it/cronaca/universitari-aumentano-le-borse-di-studio-in-trentino-m4k81yqv"],
+    "И17": ["ADiSU Umbria: рейтинги получателей 2025/26", "https://www.adisu.umbria.it/concorso-borsa-di-studio/graduatoria-aggiudicazione/2025-2026/graduatorie-dei-beneficiari-di-borsa"],
+    "И18": ["PD Regione Lombardia: idonei без стипендии (2024)", "https://pdregionelombardia.it/diritto-allo-studio-la-lombardia-pecora-nera-lascia-senza-borsa-di-studio-1-367-idonei/"],
+    "И20": ["MAECI: конкурс стипендий 2026/27", "https://www.esteri.it/wp-content/uploads/2026/03/Bando-26-27-ITA.pdf"],
+    "И21": ["ИИК в Москве: рейтинг MAECI 2026/27", "https://iicmosca.esteri.it/it/news/dall_istituto/2026/07/borse-di-studio-per-studenti-stranieri-pubblicazione-graduatoria-2026-27/"],
+    "И22": ["Progetto Radici: Invest Your Talent 2026", "https://www.progetto-radici.it/2026/04/23/invest-your-talent-in-italy-2026-borse-di-studio-per-studenti-stranieri/"],
+    "И23": ["GradRight: стипендии в Италии 2026/27", "https://gradright.com/top-scholarships-in-italy-for-international-students/"],
+    "И24": ["Politecnico di Milano: Merit Based Scholarships 2026/27", "https://www.polimi.it/fileadmin/user_upload/futuri_studenti/borse-di-studio/Call_for_Application_for_Merit_2026-2027.pdf"],
+    "И25": ["Università di Padova: International Excellence", "https://www.unipd.it/en/padua-international-excellence-scholarship-programme"],
+    "И26": ["Università di Bologna: International Talents", "https://www.unibo.it/en/study/study-grants-and-subsidies/international-talents-unibo-scholarships-for-international-students"],
+    "И27": ["Politecnico di Torino: financial aid", "https://www.polito.it/en/education/international-students/financial-aid"],
+    "И28": ["Università di Torino: scholarships", "https://en.unito.it/node/2257"],
+    "И29": ["Sapienza: scholarships for meritorious students", "https://www.uniroma1.it/en/pagina/scholarships-meritorious-students-italian-and-international-universities"],
+    "И30": ["Università di Pavia: Fees' Regulation 2026-27", "https://en.unipv.it/sites/sten/files/2026-05/Fees%27%20Regulation%20a.y.%202026-27.pdf"],
+    "И32": ["ИИК в Нью-Дели: стипендии UniTrento SIS", "https://iicnewdelhi.esteri.it/en/news/dall_istituto/2026/02/scholarships-from-the-school-of-international-studies-at-the-university-of-trento/"],
+    "И33": ["Università per Stranieri di Perugia: стипендия", "https://italianculturalsociety.org/wp-content/uploads/2026/03/info-Borsa-di-Studio-UnistraPG.pdf"],
+    "И34": ["EEAS: российские студенты в Erasmus Mundus, 2022", "https://www.eeas.europa.eu/delegations/russia/66-russian-students-have-received-eu-scholarships-continue-their-studies-eu_en"],
+    "И35": ["Bocconi: справка ISEEU parificato", "https://www.unibocconi.it/it/entrare-bocconi/corsi-di-laurea-triennale-e-giurisprudenza/agevolazioni/attestazione-iseeu-parificato-aa-2026-27"],
+    "И36": ["EDISU Piemonte: шаг за шагом 2026/27", "https://www.edisu.piemonte.it/sites/default/files/schede-informative-borse-e-contributi-documenti/bando-20262027/Step_by_step_Primi_anni_2026_27.pdf"],
+    "И38": ["Università di Pavia: коллегии", "https://portale.unipv.it/it/campus/luoghi/collegi"],
+    "И39": ["Bocconi: скидки 80% и 60%", "https://www.unibocconi.it/en/applying-bocconi/bachelor-and-law-programs/funding/80-60-partial-tuition-waivers-ay-2026-27"],
+    "И42": ["GradRight: Erasmus Mundus", "https://gradright.com/erasmus-mundus-scholarships-complete-guide-benefits-and-application-tips/"]
+  }
+};
+
+</script>
+<script>
+/* ===== Код сессии: общий для игры и админ-панели ===== */
+const CODEC = (function () {
+  "use strict";
+  const B = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const PREFIX = "SH2";
+  const CHANNELS = ["direct", "tg", "ig", "vk", "rutoitaly", "andrey", "viktor", "test", "friends", "post", "story", "chat", "wa", "site"];
+  const LEVELS = [{ id: "bach", label: "Бакалавриат", sub: "после школы" }, { id: "mag", label: "Магистратура", sub: "после бакалавриата или специалитета" }];
+  const CITS = [{ id: "RU", label: "Россия", gen: "РФ" }, { id: "KZ", label: "Казахстан", gen: "Казахстана" }, { id: "BY", label: "Беларусь", gen: "РБ" }, { id: "OT", label: "Другая страна", gen: "вашей страны" }];
+  const AGES = [{ id: 0, label: "До 25 лет" }, { id: 1, label: "26–28 лет" }, { id: 2, label: "29–30 лет" }, { id: 3, label: "31 год и старше" }];
+  const PRIOS = [
+    { id: 0, label: "Чтобы стипендии хватало на жизнь", sub: "главное — бюджет" },
+    { id: 1, label: "Сильная программа по моему направлению", sub: "главное — учёба" },
+    { id: 2, label: "Спокойный, не слишком большой город", sub: "главное — среда" }
+  ];
+  const COMP_NAMES = ["закрытая стипендия", "DSU не гарантирована", "плата в Павии", "скорый конкурс", "поздняя выплата", "дефицит жилья", "пакет документов"];
+  const SCHEMA = [["ch", 1], ["lv", 1], ["cit", 1], ["age", 1], ["fld", 1], ["pri", 1], ["c0", 1], ["c1", 1], ["c2", 1], ["p0", 2], ["p1", 2], ["p2", 2],
+    ["f0", 1], ["f1", 1], ["f2", 1], ["main", 1], ["picks", 4], ["closed", 1], ["docs", 2], ["k0", 1], ["k0c", 1], ["k1", 1], ["k1c", 1],
+    ["conf0", 1], ["conf1", 1], ["useful", 1], ["score", 2], ["info", 1], ["min", 2]];
+  const LEN = SCHEMA.reduce((a, f) => a + f[1], 0) + 1;
+  const enc = (n, w) => { const max = Math.pow(36, w) - 1; n = Math.max(0, Math.min(max, Math.round(Number(n) || 0))); let s = ""; for (let i = 0; i < w; i++) { s = B[n % 36] + s; n = Math.floor(n / 36); } return s; };
+  const dec = (s) => s.split("").reduce((a, ch) => a * 36 + B.indexOf(ch), 0);
+  function encode(o) {
+    const body = SCHEMA.map(([k, w]) => enc(o[k], w)).join("");
+    const sum = body.split("").reduce((a, ch) => a + B.indexOf(ch), 0) % 36;
+    return PREFIX + "-" + (body + B[sum]).match(/.{1,4}/g).join("-");
+  }
+  function decode(code) {
+    const s = String(code || "").toUpperCase().replace(new RegExp("^\\s*" + PREFIX + "-?"), "").replace(/[^0-9A-Z]/g, "");
+    if (s.length !== LEN) return { error: "В коде должно быть " + LEN + " знаков после " + PREFIX + ", а здесь " + s.length + "." };
+    const body = s.slice(0, LEN - 1), sum = body.split("").reduce((a, ch) => a + B.indexOf(ch), 0) % 36;
+    if (B[sum] !== s[LEN - 1]) return { error: "Контрольный знак не сходится: код скопирован с ошибкой." };
+    let p = 0; const o = {};
+    SCHEMA.forEach(([k, w]) => { o[k] = dec(body.slice(p, p + w)); p += w; });
+    o.code = PREFIX + "-" + s.match(/.{1,4}/g).join("-");
+    return o;
+  }
+  const RE = new RegExp(PREFIX + "-[0-9A-Z]{4}(?:-[0-9A-Z]{1,4}){" + Math.ceil(LEN / 4 - 1) + "}", "g");
+  return { encode, decode, RE, LEN, CHANNELS, LEVELS, CITS, AGES, PRIOS, COMP_NAMES };
+})();
+
+</script>
+<script>
+/* ===== ШТУРМАН · логика игры v1.0 ===== */
+(function () {
+  "use strict";
+  const D = DATA, C = D.cities, SCH = D.scholarships;
+  const { CHANNELS, LEVELS, CITS, AGES, PRIOS } = CODEC;
+  const KEY = "shturman.v2";
+  const MAXS = { prog: 30, cond: 25, comp: 20, plan: 15, docs: 10 };
+  const PART_NAMES = { prog: "Точность прогноза", cond: "Внимание к условиям", comp: "Решения на объездах", plan: "Запас хода", docs: "Бардачок с документами" };
+  const STAGES = ["", "Разведка", "Заправка", "Пропуск", "Объезды", "Финиш"];
+  const SCREEN_ST = { intro: 0, hello: 0, q_level: 1, q_cit: 1, q_age: 1, q_field: 1, q_prio: 1, scout: 1, money0: 2, money1: 2, money2: 2, money_sum: 2, scholar: 3, docs: 3, comp0: 4, comp1: 4, choose: 5, passport: 5 };
+  const QS = ["q_level", "q_cit", "q_age", "q_field", "q_prio"];
+  /* Настройки снаружи: на Tilda их подставляет обёртка (SHTURMAN_CFG = {collect, ch, utm, url}) */
+  const CFG = window.SHTURMAN_CFG || {};
+  const GAME_URL = CFG.url || D.gameUrl;
+  const chClean = (s) => { s = String(s || "").replace(/^#/, "").toLowerCase(); return /^[a-z0-9_-]{1,32}$/.test(s) ? s : ""; };
+
+  /* ---------- состояние ---------- */
+  function rid() { const a = "abcdefghijkmnpqrstuvwxyz23456789"; let s = ""; try { const r = crypto.getRandomValues(new Uint8Array(12)); for (let i = 0; i < 12; i++) s += a[r[i] % a.length]; } catch (e) { for (let i = 0; i < 12; i++) s += a[Math.floor(Math.random() * a.length)]; } return s; }
+  function fresh() {
+    return {
+      v: 2, sid: rid(), screen: "intro", hist: [], started: Date.now(), channel: "direct",
+      name: "", nick: "", conf0: 0, level: null, cit: null, age: null, field: null, prio: null,
+      cities0: [], cities: [], preds: [null, null, null], revealed: [false, false, false],
+      picks: [], picksAtSubmit: null, closedAtSubmit: 0, docs: [], comps: [], condScored: false,
+      main: null, compare: null, conf1: 0, useful: 0, comment: "", infoOpens: 0, infoSeen: [], swapping: null, finished: false
+    };
+  }
+  let S = fresh();
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* без хранилища игра тоже работает */ } }
+  function load() { try { const r = localStorage.getItem(KEY); if (!r) return null; const o = JSON.parse(r); return o && o.v === 2 ? o : null; } catch (e) { return null; } }
+  function clearSaved() { try { localStorage.removeItem(KEY); } catch (e) { } }
+
+  /* ---------- обезличенная статистика (только если задан адрес сбора) ----------
+     Уходят: случайный номер прохождения, канал, этап, очки, код сессии (ответы без имени),
+     комментарий. Имя и ник не уходят никогда. */
+  const TR = (function () {
+    const url = CFG.collect || "";
+    const on = !!url && navigator.doNotTrack !== "1";
+    let q = [], failed = [], timer = null, endT = null;
+    const seenS = new Set();
+    function send(body) {
+      try { fetch(url, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body, keepalive: true }).catch(() => { if (failed.length < 5) failed.push(body); }); }
+      catch (e) { try { navigator.sendBeacon(url, new Blob([body], { type: "text/plain" })); } catch (e2) { } }
+    }
+    function flush() {
+      clearTimeout(timer); timer = null;
+      while (failed.length) send(failed.shift());
+      while (q.length) send(JSON.stringify({ v: 1, evs: q.splice(0, 20) }));
+    }
+    function push(ev) {
+      if (!on) return;
+      ev.sid = S.sid; ev.ts = Date.now(); ev.ch = S.channel; ev.dev = window.innerWidth < 800 ? "m" : "d"; ev.ver = D.version;
+      q.push(ev); if (q.length >= 10) flush(); else if (!timer) timer = setTimeout(flush, 1500);
+    }
+    const code = () => { try { return sessionCode(); } catch (e) { return ""; } };
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flush(); });
+    window.addEventListener("pagehide", flush);
+    return {
+      on,
+      open() { push({ t: "open", a: chClean(CFG.utm) }); },
+      screen() { const k = S.sid + ":" + S.screen; if (seenS.has(k)) return; seenS.add(k); push({ t: "s", a: S.screen, sc: total() }); },
+      end() { if (!on || S.screen !== "passport") return; clearTimeout(endT); endT = setTimeout(() => { push({ t: "end", code: code(), sc: total(), cm: (S.comment || "").trim().slice(0, 300) }); flush(); }, 1200); },
+      via(a) { push({ t: "x", a, code: S.screen === "passport" ? code() : "" }); flush(); },
+      mark(a) { push({ t: "x", a }); }
+    };
+  })();
+
+  /* ---------- утилиты ---------- */
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+  const eur = (n, sign) => { const r = Math.round(n); const a = Math.abs(r).toLocaleString("ru-RU").replace(/ /g, " "); return (r < 0 ? "−" : sign && r > 0 ? "+" : "") + a + " €"; };
+  const bal = (c) => Math.round(D.dsuMonth - c.rent);
+  const cityByCode = (code) => C.findIndex((c) => c.code === code);
+  const nm = () => (S.name || "").trim();
+  const hi = (txt) => (nm() ? nm() + ", " + txt.charAt(0).toLowerCase() + txt.slice(1) : txt);
+  const plate = (c, lg) => `<span class="plate${lg ? " lg" : ""}" aria-hidden="true">${c.code}</span>`;
+  const srcLink = (codes) => String(codes).split(/,\s*/).map((k) => { const s = D.sources[k.trim()]; return s ? `<a href="${esc(s[1])}" target="_blank" rel="noopener">${esc(k.trim())}</a>` : esc(k); }).join(", ");
+  const badge = (kind, icon, text) => `<span class="badge ${kind}"><span aria-hidden="true">${icon}</span>${esc(text)}</span>`;
+  const DSU_BADGE = { g: ["green", "✓", "Стипендия DSU гарантирована"], d: ["slate", "≈", "Гарантия DSU только заявлена"], n: ["orange", "△", "Стипендия DSU не гарантирована"] };
+  const fieldOf = () => D.fields.find((f) => f.id === S.field) || D.fields[5];
+  const fieldMatch = (c) => { const f = fieldOf(); if (!f.keys.length) return false; const s = c.strong.toLowerCase(); return s.includes("все направления") || f.keys.some((k) => s.includes(k)); };
+  const lc = (t) => t.charAt(0).toLowerCase() + t.slice(1);
+  const adj = (c) => ({ g: 60, d: 20, n: -80 }[c.dsu]);
+  function plural(n, one, few, many) { const a = n % 10, b = n % 100; if (a === 1 && b !== 11) return one; if (a >= 2 && a <= 4 && (b < 12 || b > 14)) return few; return many; }
+
+  /* ---------- словарь: значки «i» ---------- */
+  const TERMS = [
+    ["ISEE parificato", /ISEE parificato/], ["Dichiarazione di valore", /Dichiarazione di valore/], ["permesso di soggiorno", /permesso di soggiorno/],
+    ["codice fiscale", /codice fiscale/], ["Erasmus Mundus", /Erasmus Mundus/], ["Invest Your Talent", /Invest Your Talent/], ["Foundation Course", /Foundation Course/],
+    ["коллегия di merito", /коллеги[а-яё]* di merito/], ["виза типа D", /виз[а-яё]* типа D/], ["fuori sede", /fuori sede/], ["Universitaly", /Universitaly/],
+    ["ISEE", /ISEE(?! parificato)/], ["MAECI", /MAECI/], ["AFAM", /AFAM/], ["PhD", /PhD/], ["CIMEA", /CIMEA/], ["GRE", /GRE(?=[\s,.;)])/],
+    ["IMAT", /IMAT/], ["Censis", /Censis/], ["DSU", /DSU/], ["апостиль", /апостил[а-яё]*/]
+  ];
+  let seen = new Set();
+  const ib = (term) => `<button class="ib" data-a="info" data-v="${esc(term)}" aria-label="Что такое ${esc(term)}?">i</button>`;
+  function gl(text) {
+    let out = esc(text);
+    TERMS.forEach(([term, re]) => {
+      if (seen.has(term) || !D.glossary[term]) return;
+      const m = out.match(re);
+      if (!m) return;
+      const at = out.indexOf(m[0]);
+      if (out.lastIndexOf("<", at) > out.lastIndexOf(">", at)) return;
+      out = out.slice(0, at) + `<span class="nw">${m[0]}${ib(term)}</span>` + out.slice(at + m[0].length);
+      seen.add(term);
+    });
+    return out;
+  }
+  function termsIn(text) { return TERMS.filter(([term, re]) => D.glossary[term] && re.test(text)).map(([term]) => term); }
+  const dsuBadge = (c) => { const b = DSU_BADGE[c.dsu]; return `<span class="badge ${b[0]}"><span aria-hidden="true">${b[1]}</span><span>${gl(b[2])}</span></span>`; };
+
+  /* ---------- подбор городов ---------- */
+  function score(i) {
+    const c = C[i], b = bal(c), m = fieldMatch(c) ? 1 : 0;
+    if (S.prio === 1) return m * 150 + c.eng * (S.level === "mag" ? 20 : 8) + b * 0.2 + adj(c) * 0.5 + (c.sizeK === 3 ? 20 : 0);
+    if (S.prio === 2) return (c.sizeK === 1 ? 120 : c.sizeK === 2 ? 70 : 0) + b * 0.5 + adj(c) * 0.5 + m * 40;
+    return b + adj(c) + m * 40;
+  }
+  const suggest = () => C.map((_, i) => i).sort((a, b) => score(b) - score(a)).slice(0, 3);
+  function reasons(i) {
+    const c = C[i], out = [];
+    if (fieldMatch(c)) out.push("сильные направления: " + c.strong);
+    if (c.eng >= 4) out.push("много программ на английском");
+    if (c.sizeK === 1) out.push("маленький город");
+    if (c.sizeK === 3) out.push(c.size.toLowerCase());
+    if (!out.length) out.push("сильные направления: " + c.strong);
+    return out.join(" · ");
+  }
+
+  /* ---------- доступность стипендий ---------- */
+  function elig(s) {
+    const why = [], hard = []; let st = "open";
+    const closed = (t) => { st = "closed"; why.push(t); hard.push(t); };
+    const check = (t) => { if (st !== "closed") st = "check"; why.push(t); };
+    if (!s.levels.includes("any") && !s.levels.includes(S.level)) closed(s.levels.includes("mag") ? "она только для магистратуры" : "она только для бакалавриата");
+    const cv = S.cit === "OT" ? (Object.values(s.cit).every((x) => x === "none") ? "none" : "check") : s.cit[S.cit];
+    if (cv === "no") closed("она закрыта для граждан " + CITS.find((x) => x.id === S.cit).gen);
+    if (cv === "check") check("доступ по гражданству надо проверить");
+    if (s.ageMax === 28 && S.age >= 2) closed("возрастной предел — 28 лет");
+    if (s.ageMax === 30 && S.age >= 3) closed("возрастной предел — 30 лет");
+    if (s.ageIYT) { if (S.age >= 2) closed("в конкурсе 2026 года — только рождённые не раньше 01.01.2000"); else if (S.age === 1) check("проверьте дату рождения: в 2026 году — не раньше 01.01.2000"); }
+    if (s.needItDiploma) closed("нужен диплом итальянского вуза");
+    return { st, why, hard };
+  }
+  const ELIG_BADGE = { open: ["green", "✓", "Ограничений для вас не найдено"], check: ["yellow", "!", "Проверьте условия сами"], closed: ["red", "✕", "Закрыто для вас"] };
+  const relevantSch = () => SCH.filter((s) => s.cities.includes("*") || s.cities.some((code) => S.cities.some((i) => C[i].code === code)));
+
+  /* ---------- объезды (осложнения) ---------- */
+  const usedIds = () => S.comps.filter(Boolean).map((x) => x.id);
+  function bestReplacement(exclude) {
+    const pool = C.map((_, i) => i).filter((i) => !S.cities.includes(i) && i !== exclude && C[i].dsu === "g" && !["RM", "ME"].includes(C[i].code));
+    pool.sort((a, b) => score(b) - score(a));
+    return pool.length ? pool[0] : null;
+  }
+  function buildComp() {
+    const used = usedIds(), cand = [];
+    if (!used.includes(0)) {
+      const bad = S.picks.map((id) => SCH.find((s) => s.id === id)).find((s) => s && elig(s).st === "closed");
+      if (bad) {
+        const alt = relevantSch().find((s) => !S.picks.includes(s.id) && elig(s).st === "open" && s.id !== "dsu");
+        const opts = [{ label: "Убрать её из плана", act: "drop", out: "Убрали. Время и силы уйдут на то, что вам действительно доступно." }];
+        if (alt) opts.push({ label: "Заменить на «" + alt.name + "»", act: "swap", alt: alt.id, out: "Заменили на «" + alt.name + "». Ограничений для вас в её условиях нет, но конкурс всё равно придётся пройти." });
+        cand.push({ id: 0, sch: bad.id, title: "Шлагбаум: «" + bad.name + "» вам закрыта", text: "Вы отметили её в плане, но " + elig(bad).hard.join("; ") + ". Подать заявку не получится.", src: bad.src, lesson: "Условия по возрасту, гражданству и диплому стоит проверять до того, как считать деньги.", opts });
+      }
+    }
+    if (!used.includes(1)) {
+      const ci = S.cities.find((i) => C[i].dsu === "n");
+      if (ci != null) {
+        const c = C[ci], rep = bestReplacement(ci);
+        const opts = [{ label: "Оставить " + c.name + " и копить запас", act: "keep", out: "Город остаётся в маршруте. В Паспорт попадёт риск: если стипендии не будет, комната обойдётся в " + eur(c.rent) + " в месяц из своих денег.", risk: c.name + ": стипендия DSU не гарантирована; без неё комната — " + eur(c.rent) + " в месяц из своих денег" }];
+        if (rep != null) opts.push({ label: "Свернуть в " + C[rep].name, act: "replace", from: ci, to: rep, out: C[rep].name + " вместо " + c.name + ". " + C[rep].dsuNote + " После комнаты там остаётся " + eur(bal(C[rep]), true) + " в месяц." });
+        cand.push({ id: 1, city: ci, title: "Туман над " + c.region.replace(/ия$/, "ией") + ": стипендия не гарантирована", text: "Можно пройти по всем критериям DSU и остаться без денег. " + c.dsuNote + " Если выплаты не будет, комнату в " + c.loc + " оплачиваете сами: " + eur(c.rent) + " в месяц.", src: c.dsuSrc, lesson: "Пройти по критериям DSU и получить деньги — не одно и то же. Смотрите, платит ли регион всем.", opts });
+      }
+    }
+    if (!used.includes(2) && S.cit === "RU" && S.cities.includes(cityByCode("PV"))) {
+      cand.push({ id: 2, title: "Платный участок: Павия для граждан РФ", text: "Если не подавать документы о доходах семьи, гражданин РФ платит в Павии фиксированно 4 550 € в год на естественных науках и 3 550 € на гуманитарных. Для граждан Казахстана и Беларуси — 1 520 € и 1 020 €.", src: "И30", lesson: "Считать не только аренду, но и плату за учёбу для своего гражданства.", opts: [
+        { label: "Заложить 4 550 € в год в бюджет", act: "keep", out: "В Паспорт попадёт риск: плата за учёбу в Павии до 4 550 € в год.", risk: "Павия: плата за учёбу для РФ до 4 550 € в год без документов о доходах" },
+        { label: "Собрать документы о доходах семьи", act: "info", out: "Если подать документы о доходах семьи, плату посчитают по доходу. Это тот же пакет, что нужен для DSU, так что работа делается один раз.", risk: "Павия: плата зависит от пакета документов о доходах семьи" }] });
+    }
+    if (!used.includes(3)) {
+      const soon = S.picks.map((id) => SCH.find((s) => s.id === id)).find((s) => s && s.soon && elig(s).st !== "closed");
+      if (soon) cand.push({ id: 3, sch: soon.id, title: "Поворот близко: конкурс «" + soon.name + "»", text: "Прошлый срок — " + soon.deadline + ". Следующий " + soon.next + ", примерно за 9–10 месяцев до начала учёбы. Чтобы успеть, заявку надо готовить уже сейчас.", src: soon.src, lesson: "Сроки стипендий наступают раньше, чем кажется: часть закрывается за 9 месяцев до учёбы.", opts: [
+        { label: "Готовлю заявку в ближайший месяц", act: "keep", out: "В Паспорт попадёт срок: " + soon.next + ".", risk: "«" + soon.name + "»: конкурс " + soon.next + " — готовить заявку сейчас" },
+        { label: "Переношу на следующий год", act: "drop", out: "Убрали из плана на этот год. Если будете поступать позже, конкурс пройдёт в те же месяцы." }] });
+    }
+    if (!used.includes(4)) {
+      const ci = S.cities.find((i) => ["RM", "ME"].includes(C[i].code));
+      if (ci != null) {
+        const c = C[ci], rep = bestReplacement(ci), rome = c.code === "RM";
+        const opts = [{ label: "Заложить запас на аренду", act: "keep", out: rome ? "В Паспорт попадёт риск: запас около " + eur(c.rent * 6) + " на полгода аренды." : "В Паспорт попадёт риск: запас на несколько месяцев аренды по " + eur(c.rent) + ".", risk: rome ? "Рим: стипендия может прийти через полгода — запас около " + eur(c.rent * 6) : "Мессина: стипендию платят в конце учебного года — нужен запас на аренду" }];
+        if (rep != null) opts.push({ label: "Свернуть в " + C[rep].name, act: "replace", from: ci, to: rep, out: C[rep].name + " вместо " + c.name + ". После комнаты там остаётся " + eur(bal(C[rep]), true) + " в месяц." });
+        cand.push({ id: 4, city: ci, title: "Пробка: в " + c.loc + " стипендия приходит не сразу", text: rome ? "В Лацио стипендию за 2025/26 получили все, кто прошёл по критериям, но только в апреле — через полгода после начала учёбы. Всё это время комнату оплачиваете сами." : "В Сицилии стипендии за 2025/26 оплатили всем, но выплаты — в конце учебного года. До этого аренда на вас.", src: c.dsuSrc, lesson: "Гарантия стипендии не значит, что деньги придут к первому платежу за жильё.", opts });
+      }
+    }
+    if (!used.includes(5)) {
+      const ci = S.cities.find((i) => ["MI", "BO"].includes(C[i].code));
+      if (ci != null) {
+        const c = C[ci], pct = c.code === "MI" ? "31,5%" : "23,5%";
+        cand.push({ id: 5, city: ci, title: "Нет мест на стоянке: в " + c.loc + " мало комнат", text: "За год комнат на рынке в " + c.loc + " стало на " + pct + " меньше. Найти жильё к сентябрю может оказаться сложнее, чем за него заплатить.", src: "И2", lesson: "Проверять не только цену комнаты, но и есть ли комнаты вообще.", opts: [
+          { label: "Начать искать жильё заранее", act: "keep", out: "В Паспорт попадёт шаг: искать жильё заранее.", risk: c.name + ": комнат мало — искать жильё заранее" },
+          { label: "Узнать про общежитие по DSU", act: "info", out: "Часть стипендии DSU иногда выдают местом в общежитии. Уточните это у регионального агентства, когда будете подавать.", risk: c.name + ": комнат мало — уточнить место в общежитии" }] });
+      }
+    }
+    if (!used.includes(6)) {
+      cand.push({ id: 6, title: "Техосмотр: пакет документов для DSU", text: "Иностранцу для DSU нужен пакет примерно из 11 документов о доходах и имуществе семьи с апостилем и переводом. Неполный пакет не принимают, а это потеря около 7 000 € в год.", src: "И35", lesson: "Пакет документов о доходах — отдельная задача на несколько месяцев, а не формальность.", opts: [
+        { label: "Добавить сбор пакета в план", act: "keep", out: "В Паспорт попадёт шаг: собрать пакет документов о доходах семьи.", risk: "Собрать пакет документов о доходах семьи для DSU с апостилем и переводом" },
+        { label: "Я уже собираю", act: "info", out: "Отлично. Сверьте перечень с требованиями своего регионального агентства DSU." }] });
+    }
+    return cand[0] || null;
+  }
+  function applyChoice(k, oi) {
+    const cp = S.comps[k]; if (!cp || cp.choice != null) return;
+    const o = cp.opts[oi]; cp.choice = oi;
+    if (o.act === "drop" && cp.sch) S.picks = S.picks.filter((x) => x !== cp.sch);
+    if (o.act === "swap") { S.picks = S.picks.filter((x) => x !== cp.sch); if (!S.picks.includes(o.alt)) S.picks.push(o.alt); }
+    if (o.act === "replace") {
+      S.cities = S.cities.map((i) => (i === o.from ? o.to : i)); if (S.main === o.from) S.main = null;
+      const codes = S.cities.map((i) => C[i].code);
+      const lost = S.picks.map((id) => SCH.find((s) => s.id === id)).filter((s) => s && !s.cities.includes("*") && !s.cities.some((c) => codes.includes(c)));
+      if (lost.length) { S.picks = S.picks.filter((id) => !lost.some((s) => s.id === id)); cp.lostNote = "Из плана убраны стипендии, которые действуют только в городе " + C[o.from].name + ": " + lost.map((s) => "«" + s.name + "»").join(", ") + "."; }
+    }
+  }
+  const risks = () => S.comps.filter((x) => x && x.choice != null && x.opts[x.choice].risk).map((x) => x.opts[x.choice].risk);
+
+  /* ---------- очки, звание, значки ---------- */
+  function accuracy() {
+    let n = 0, sum = 0, hits = 0, best = null;
+    S.cities0.forEach((ci, i) => { if (S.revealed[i] && S.preds[i] != null) { n++; const d = Math.abs(S.preds[i] - bal(C[ci])); sum += d; if (d <= 100) hits++; best = best == null ? d : Math.min(best, d); } });
+    return { n, avg: n ? Math.round(sum / n) : 0, hits, best };
+  }
+  const predPts = (d) => (d <= 30 ? 10 : d <= 60 ? 7 : d <= 100 ? 4 : 1);
+  function parts() {
+    const p = { prog: 0, cond: 0, comp: 0, plan: 0, docs: 0 };
+    S.cities0.forEach((ci, i) => { if (S.revealed[i] && S.preds[i] != null) p.prog += predPts(Math.abs(S.preds[i] - bal(C[ci]))); });
+    if (S.condScored) p.cond = S.picksAtSubmit ? Math.max(0, 25 - 12 * S.closedAtSubmit) : 10;
+    p.comp = S.comps.filter((x) => x && x.choice != null).length * 10;
+    if (S.finished) p.plan = bal(C[mainCity()]) >= 0 ? 15 : 8;
+    if (S.condScored) p.docs = Math.min(10, S.docs.length);
+    return p;
+  }
+  const total = () => Object.values(parts()).reduce((a, b) => a + b, 0);
+  function rank(t) {
+    if (t >= 85) return { name: "Штурман ралли", next: null };
+    if (t >= 65) return { name: "Опытный штурман", next: 85 };
+    if (t >= 40) return { name: "Штурман с картой", next: 65 };
+    return { name: "Новичок на трассе", next: 40 };
+  }
+  function badges() {
+    const a = accuracy();
+    return [
+      { icon: "◎", name: "Точный глаз", how: "прогноз ближе 30 € хотя бы по одному городу", got: a.best != null && a.best <= 30 },
+      { icon: "≈", name: "Калибровка", how: "средний промах по трём городам до 60 €", got: a.n === 3 && a.avg <= 60 },
+      { icon: "✎", name: "Читаю мелкий шрифт", how: "ни одной закрытой для вас стипендии в плане", got: !!S.picksAtSubmit && S.closedAtSubmit === 0 },
+      { icon: "↻", name: "Объезд найден", how: "решения на обоих объездах", got: S.comps.filter((x) => x && x.choice != null).length >= 2 },
+      { icon: "▮", name: "Запас хода", how: "в основном городе остаётся от 100 € в месяц", got: S.cities.length > 0 && bal(C[mainCity()]) >= 100 },
+      { icon: "i", name: "Любознательный", how: "открыть три пояснения к терминам", got: S.infoOpens >= 3 },
+      { icon: "▣", name: "Бардачок", how: "готово пять документов из десяти", got: S.docs.length >= 5 }
+    ];
+  }
+
+  /* ---------- код сессии и тексты ---------- */
+  function mainCity() { return S.main != null && S.cities.includes(S.main) ? S.main : S.cities.slice().sort((a, b) => bal(C[b]) + adj(C[b]) - (bal(C[a]) + adj(C[a])))[0]; }
+  function sessionCode() {
+    let pm = 0; SCH.forEach((s, i) => { if (S.picks.includes(s.id)) pm += Math.pow(2, i); });
+    let dm = 0; D.docs.forEach((d, i) => { if (S.docs.includes(d.id)) dm += Math.pow(2, i); });
+    const ch = CHANNELS.indexOf(S.channel), k = (i) => S.comps[i], pr = (i) => (S.preds[i] == null ? 99 : (S.preds[i] + 300) / 10), cc = (arr, i) => (arr[i] == null ? 35 : arr[i]);
+    return CODEC.encode({
+      ch: ch < 0 ? 35 : ch, lv: S.level === "mag" ? 1 : 0, cit: Math.max(0, CITS.findIndex((x) => x.id === S.cit)), age: S.age || 0,
+      fld: Math.max(0, D.fields.findIndex((x) => x.id === S.field)), pri: S.prio || 0,
+      c0: cc(S.cities0, 0), c1: cc(S.cities0, 1), c2: cc(S.cities0, 2), p0: pr(0), p1: pr(1), p2: pr(2),
+      f0: cc(S.cities, 0), f1: cc(S.cities, 1), f2: cc(S.cities, 2), main: S.cities.length ? mainCity() : 35,
+      picks: pm, closed: S.closedAtSubmit || 0, docs: dm,
+      k0: k(0) ? k(0).id : 35, k0c: k(0) && k(0).choice != null ? k(0).choice : 35, k1: k(1) ? k(1).id : 35, k1c: k(1) && k(1).choice != null ? k(1).choice : 35,
+      conf0: S.conf0, conf1: S.conf1, useful: S.useful, score: total(), info: Math.min(35, S.infoOpens),
+      min: Math.min(999, Math.round((Date.now() - S.started) / 60000))
+    });
+  }
+  function messageText() {
+    const m = C[mainCity()], others = S.cities.filter((i) => i !== mainCity()).map((i) => C[i]);
+    const pk = S.picks.map((id) => SCH.find((s) => s.id === id)).filter(Boolean);
+    const L = ["Здравствуйте, Андрей! Это мой Паспорт маршрута из игры «Штурман». Хочу обсудить выбор города и план подачи.", ""];
+    L.push("Имя: " + (nm() || "—"));
+    L.push("Ник: " + (S.nick.trim() || "—"));
+    L.push("Основной город: " + m.name + ", " + eur(bal(m), true) + " в месяц после комнаты; " + lc(DSU_BADGE[m.dsu][2]));
+    if (others.length) L.push("Запасные: " + others.map((c) => c.name + " (" + eur(bal(c), true) + ")").join(", "));
+    L.push("Стипендии в плане: " + (pk.length ? pk.map((s) => s.name).join("; ") : "пока нет"));
+    const rk = risks(); if (rk.length) L.push("Риски: " + rk.join("; "));
+    const t = total(); L.push("Очки: " + t + " из 100, «" + rank(t).name + "»");
+    L.push("Отзыв: уверенность " + (S.conf0 || "—") + " → " + (S.conf1 || "—") + " из 5, польза " + (S.useful || "—") + " из 5");
+    L.push("Комментарий: " + (S.comment.trim() ? S.comment.trim().slice(0, 300).replace(/\s*\n+\s*/g, " ") : "—"));
+    if (CHANNELS.indexOf(S.channel) < 0) L.push("Канал: " + S.channel);
+    L.push("Код: " + sessionCode());
+    return L.join("\n");
+  }
+  function passportText() {
+    const m = C[mainCity()], others = S.cities.filter((i) => i !== mainCity()).map((i) => C[i]);
+    const pk = S.picks.map((id) => SCH.find((s) => s.id === id)).filter(Boolean);
+    const L = ["Штурман · Паспорт маршрута" + (nm() ? " · " + nm() : ""), ""];
+    L.push("Основной город: " + m.name + " (" + m.region + ")");
+    L.push("Баланс: " + eur(bal(m), true) + " в месяц — стипендия DSU 597,59 € минус комната " + eur(m.rent));
+    L.push(DSU_BADGE[m.dsu][2]);
+    if (others.length) L.push("Запасные: " + others.map((c) => c.name + " (" + eur(bal(c), true) + ")").join(", "));
+    L.push("", "Стипендии в плане:");
+    if (pk.length) pk.forEach((s) => L.push("— " + s.name + ": " + s.amount + "; следующий конкурс " + s.next)); else L.push("— пока нет");
+    const rk = risks(); if (rk.length) { L.push("", "Риски и шаги:"); rk.forEach((r) => L.push("— " + r)); }
+    L.push("", "Документы: готово " + S.docs.length + " из " + D.docs.length);
+    const t = total(); L.push("Очки штурмана: " + t + " из 100 · " + rank(t).name);
+    L.push("", "Обсудить маршрут: " + D.contact.name + ", t.me/" + D.contact.tg);
+    L.push("Код: " + sessionCode());
+    L.push("Цифры — ориентир по данным на " + D.checkedAt + ", без еды, транспорта и страховки.");
+    return L.join("\n");
+  }
+  const tgHref = () => "https://t.me/" + D.contact.tg + "?text=" + encodeURIComponent(messageText());
+  const waHref = () => "https://wa.me/?text=" + encodeURIComponent(passportText());
+  const shareText = "Проверил(а) на деньги три города Италии для учёбы в игре «Штурман». Попробуйте тоже, это 10 минут.";
+  const tgShareHref = () => "https://t.me/share/url?url=" + encodeURIComponent(GAME_URL + "#friends") + "&text=" + encodeURIComponent(shareText);
+  const waShareHref = () => "https://wa.me/?text=" + encodeURIComponent(shareText + " " + GAME_URL + "#friends");
+
+  /* ---------- карта маршрута ---------- */
+  const PX = (lon) => (lon - 6.5) * 27.9 + 30, PY = (lat) => (47.2 - lat) * 37.7 + 10;
+  function mapSVG(o) {
+    o = o || {};
+    const sel = o.sel || [], main = o.main, showBal = o.showBal, inter = o.interactive;
+    const land = D.outline.map((poly) => "M" + poly.map(([lo, la]) => PX(lo).toFixed(1) + "," + PY(la).toFixed(1)).join("L") + "Z").join(" ");
+    const route = sel.slice().sort((a, b) => C[b].lat - C[a].lat).map((i) => PX(C[i].lon).toFixed(1) + "," + PY(C[i].lat).toFixed(1)).join(" ");
+    const cities = C.map((c, i) => {
+      const x = PX(c.lon), y = PY(c.lat), on = sel.includes(i), isMain = i === main, px = x + c.lx, py = y + c.ly;
+      const lab = `<rect x="${px.toFixed(1)}" y="${py.toFixed(1)}" width="34" height="22" rx="4"/><text x="${(px + 17).toFixed(1)}" y="${(py + 15.5).toFixed(1)}" text-anchor="middle">${c.code}</text>`;
+      const balT = showBal && on ? `<text class="bal" x="${(px + 17).toFixed(1)}" y="${(py + 36).toFixed(1)}" text-anchor="middle">${eur(bal(c), true)}</text>` : "";
+      return `<g class="pl${on ? " on" : ""}${isMain ? " main" : ""}"${inter ? ` data-a="cityinfo" data-v="${i}" role="button" tabindex="0" aria-label="${esc(c.name)}: подробнее"` : ""}><circle class="dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${on ? 4.5 : 3}"/>${lab}${balT}</g>`;
+    }).join("");
+    return `<svg class="map" viewBox="0 0 370 415" role="${inter ? "group" : "img"}" aria-label="${esc(o.label || "Схема Италии с городами маршрута")}"><rect class="sea" x="0" y="0" width="370" height="415" rx="14"/><path class="land" d="${land}"/>${sel.length > 1 ? `<polyline class="road" points="${route}"/>` : ""}${cities}</svg>`;
+  }
+
+  /* ---------- навигация ---------- */
+  function go(next) { S.hist.push(S.screen); S.screen = next; S.swapping = null; save(); render(true); }
+  function back() { if (!S.hist.length) return; S.screen = S.hist.pop(); S.swapping = null; save(); render(true); }
+
+  /* ---------- общие куски ---------- */
+  const CAR = `<svg viewBox="0 0 28 16" width="28" height="16" aria-hidden="true"><rect x="2" y="3" width="24" height="9" rx="3" fill="currentColor"/><rect x="8" y="0" width="11" height="6" rx="2" fill="currentColor"/><circle cx="8" cy="13" r="3" fill="var(--ink)"/><circle cx="21" cy="13" r="3" fill="var(--ink)"/></svg>`;
+  function header() {
+    const st = SCREEN_ST[S.screen] || 0;
+    if (!st) return "";
+    const t = total();
+    const ms = [1, 2, 3, 4, 5].map((i) => `<span class="ms${i < st ? " done" : i === st ? " cur" : ""}"></span>`).join("");
+    const pos = ((st - 1) / 4) * 100;
+    return `<div class="top"><div class="top-row"><button class="back" data-a="back" aria-label="Назад">← Назад</button><span class="label">Этап ${st} из 5 · <b>${STAGES[st]}</b></span><span class="score" role="img" aria-label="Очки штурмана: ${t} из 100"><span aria-hidden="true">★ ${t}</span></span></div>
+      <div class="roadbar" aria-hidden="true"><div class="lane"></div>${ms}<span class="car" style="left:calc(${pos}% - 14px)">${CAR}</span></div></div>`;
+  }
+  function opt(label, sub, pressed, a, v, check, extra) {
+    return `<button class="opt${check ? " check" : ""}" data-a="${a}" data-v="${esc(v)}" aria-pressed="${pressed ? "true" : "false"}"${extra || ""}><span class="mark" aria-hidden="true">${pressed ? "✓" : ""}</span><span>${esc(label)}${sub ? `<span class="sub">${esc(sub)}</span>` : ""}</span></button>`;
+  }
+  function scale(name, val, lo, hiTxt) {
+    return `<div class="stack"><div class="scale" role="group" aria-label="${esc(name)}">${[1, 2, 3, 4, 5].map((n) => `<button class="opt" data-a="scale" data-k="${name}" data-v="${n}" aria-pressed="${val === n ? "true" : "false"}" aria-label="${n} из 5">${n}</button>`).join("")}</div><div class="scale-legend"><span>${esc(lo)}</span><span>${esc(hiTxt)}</span></div></div>`;
+  }
+  const lead = (txt) => `<p class="lead">${gl(txt)}</p>`;
+
+  /* ---------- экраны ---------- */
+  const T = {};
+  T.intro = () => {
+    const saved = load(), resume = saved && !["intro", "hello"].includes(saved.screen) && !saved.finished;
+    const step = (n, t, d) => `<div class="leg"><span class="legn">${n}</span><div><b>${t}</b><p class="small muted">${d}</p></div></div>`;
+    return `<div class="screen">
+      <div class="stack" style="padding-top:20px">
+        <div class="hero-signs" aria-hidden="true">${["MI", "BO", "TO", "PI", "ME"].map((c) => `<span class="plate">${c}</span>`).join("")}</div>
+        <h1 tabindex="-1" class="title">Штурман</h1>
+        <p class="lead">Игра о том, как выбрать город для учёбы в Италии и не остаться без денег на жизнь.</p>
+      </div>
+      ${mapSVG({ sel: [cityByCode("MI"), cityByCode("BO"), cityByCode("PI"), cityByCode("ME")], label: "Схема Италии: маршрут через Милан, Болонью, Пизу и Мессину" })}
+      <div class="card"><h2>Зачем это</h2><p>Про Италию часто говорят: учёба почти бесплатная, а стипендия покроет жизнь. На деле в Милане стипендии не хватает даже на комнату, а в Мессине после аренды остаётся около 300 € в месяц. За 10–12 минут вы увидите это на своих цифрах.</p></div>
+      <div class="card"><h2>Кому пригодится</h2><p>Тем, кто собирается в бакалавриат или магистратуру в Италии из России, Казахстана, Беларуси или другой страны и ещё не выбрал город. И тем, кто выбрал, но пока не считал деньги.</p></div>
+      <div class="card"><h2>Как играть</h2><p class="small muted">Вы — штурман. Задача — проложить маршрут к учёбе так, чтобы хватило топлива, то есть денег. Впереди пять этапов:</p>
+        <div class="legs">${step(1, "Разведка", "подберём три города под ваш профиль")}${step(2, "Заправка", "угадаете, сколько останется от стипендии после аренды")}${step(3, "Пропуск", "стипендии, документы и сроки")}${step(4, "Объезды", "препятствия, которые вытекают из ваших ответов")}${step(5, "Финиш", "Паспорт маршрута, звание и разбор с экспертом")}</div>
+        <p class="small"><b>Очки штурмана</b> дают за точные прогнозы, внимание к условиям и решения на объездах. За скорость очков нет.</p></div>
+      <p class="src">Данные: 12 городов, 18 стипендий, 42 источника, проверено ${D.checkedAt}.</p>
+      <div class="btns">${resume ? `<button class="btn" data-a="resume">Продолжить маршрут</button><button class="btn sec" data-a="start">Начать заново</button>` : `<button class="btn" data-a="start">Поехали</button>`}</div>
+    </div>`;
+  };
+  T.hello = () => `<div class="screen">
+      <div class="stack" style="padding-top:20px"><h1 tabindex="-1">Давайте знакомиться</h1><p class="lead">Перед дорогой штурман записывается в бортовой журнал.</p></div>
+      <div class="field"><label for="nm">Как к вам обращаться?</label><input id="nm" type="text" maxlength="40" autocomplete="given-name" value="${esc(S.name)}" placeholder="Имя"></div>
+      <div class="field"><label for="nk">Ник в Telegram или Instagram</label><input id="nk" type="text" maxlength="40" autocomplete="off" autocapitalize="off" value="${esc(S.nick)}" placeholder="@ник"><p class="small muted">Пригодится, если в конце отправите Паспорт эксперту: так он сможет вам ответить. Мы ничего не отправляем без вас.</p></div>
+      ${TR.on ? `<p class="small muted">Игра без имени и ника записывает, где вы остановились и что ответили: так мы поймём, что в ней улучшить. Имя и ник остаются у вас.</p>` : ""}
+      <div class="stack"><h2>Насколько вы уверены, в каком городе хотите учиться?</h2>${scale("conf0", S.conf0, "совсем не уверен(а)", "точно знаю")}</div>
+      <button class="btn" data-a="hello_next" ${nm() ? "" : "disabled"}>Дальше</button>
+      <p class="small muted">Чтобы продолжить, напишите имя.</p>
+    </div>`;
+
+  const QDEF = {
+    q_level: { key: "level", items: LEVELS, title: () => hi("На какой уровень поступаете?"), text: "Начнём разведку. От уровня зависит, какие стипендии вам вообще доступны: часть из них только для магистратуры." },
+    q_cit: { key: "cit", items: CITS, title: () => "Какое у вас гражданство?", text: "Паспорт тоже влияет на маршрут: одни стипендии закрыты для отдельных стран, а в Павии плата за учёбу для граждан РФ втрое выше, чем для Казахстана и Беларуси." },
+    q_age: { key: "age", items: AGES, title: () => "Сколько вам будет лет к началу учёбы?", text: "У нескольких стипендий есть возрастной предел. Возраст останется только в этой игре." },
+    q_field: { key: "field", items: D.fields, title: () => "Какое направление выбираете?", text: "По нему подберём города, где ваша специальность сильная." },
+    q_prio: { key: "prio", items: PRIOS, title: () => "Что для вас главное в городе?", text: "Последний вопрос разведки. От ответа зависит, какие три города проверим первыми." }
+  };
+  QS.forEach((q, qi) => {
+    T[q] = () => {
+      const d = QDEF[q], val = S[d.key];
+      return `<div class="screen"><div class="stack"><p class="small muted">Вопрос ${qi + 1} из 5</p><h1 tabindex="-1">${esc(d.title())}</h1>${lead(d.text)}</div>
+        <div class="opts">${d.items.map((it) => opt(it.label, it.sub, val === it.id, "pick", d.key + ":" + it.id)).join("")}</div>
+        <button class="btn" data-a="qnext" ${val == null ? "disabled" : ""}>${qi < 4 ? "Дальше" : "Проложить маршрут"}</button></div>`;
+    };
+  });
+
+  T.scout = () => {
+    const all = SCH.map(elig);
+    const n = { open: all.filter((x) => x.st === "open").length, check: all.filter((x) => x.st === "check").length, closed: all.filter((x) => x.st === "closed").length };
+    const rows = S.cities0.map((ci, k) => {
+      const c = C[ci];
+      return `<div class="card"><div class="city">${plate(c, true)}<div class="grow"><div class="nm">${esc(c.name)}</div><div class="rg">${esc(c.region)}</div></div><button class="btn link mini" data-a="swap" data-v="${k}" aria-expanded="${S.swapping === k}">Заменить</button></div>
+        <p class="small muted">${gl(reasons(ci))}</p>${S.swapping === k ? swapGrid(k) : ""}</div>`;
+    }).join("");
+    return `<div class="screen">
+      <div class="stack"><h1 tabindex="-1">${esc(hi("Разведка закончена"))}</h1>${lead("Сначала о деньгах в целом. Из 18 стипендий и льгот в нашей базе по вашему профилю выходит так:")}</div>
+      <div class="kpis">
+        <div class="kpi"><span class="v" style="color:var(--green)">${n.open}</span><span class="l">ограничений не найдено</span></div>
+        <div class="kpi"><span class="v" style="color:var(--yellow-text)">${n.check}</span><span class="l">надо проверить</span></div>
+        <div class="kpi"><span class="v" style="color:var(--red)">${n.closed}</span><span class="l">вам закрыты</span></div>
+      </div>
+      <p class="small muted">Какие именно — увидите на этапе «Пропуск». А пока — маршрут.</p>
+      <div class="stack"><h2>Ваш маршрут: три города</h2><p class="small muted">Подобрали по вашим ответам. Нажмите на табличку на карте, чтобы узнать о городе больше, или замените его.</p></div>
+      ${mapSVG({ sel: S.cities0, interactive: true, label: "Схема Италии: ваш маршрут через " + S.cities0.map((i) => C[i].name).join(", ") })}
+      ${rows}
+      <div class="note">Следующий этап — заправка. Узнаем, хватит ли стипендии хотя бы на комнату в каждом из этих городов.</div>
+      <button class="btn" data-a="go" data-v="money0">На заправку</button>
+    </div>`;
+  };
+  function swapGrid(k) {
+    return `<div class="tiles" role="group" aria-label="Выберите город на замену">${C.map((c, i) => `<button class="tile" data-a="swapto" data-k="${k}" data-v="${i}" ${S.cities0.includes(i) ? "disabled" : ""}><span class="plate">${c.code}</span><span>${esc(c.name)}</span></button>`).join("")}</div>`;
+  }
+
+  function moneyScreen(k) {
+    const ci = S.cities0[k], c = C[ci], fact = bal(c), rev = S.revealed[k], pred = S.preds[k];
+    const pos = (v) => Math.max(0, Math.min(100, ((v + 300) / 700) * 100));
+    let body;
+    if (!rev) {
+      const v = pred == null ? 0 : pred;
+      body = `${k === 0 ? `<div class="note">${gl("Как это работает: минимальная стипендия DSU для тех, кто учится не в своём городе, — 597,59 € в месяц. Это ваше топливо. Главный расход — аренда комнаты. Угадайте, сколько останется в баке после неё.")}</div>` : ""}
+        <div class="card">
+        <h2 id="q${k}">Сколько останется от 597,59 € после оплаты комнаты в ${esc(c.loc)}?</h2>
+        <div class="slider">
+          <output class="slider-val" id="pv" for="sl">${pred == null ? "Сдвиньте ползунок" : eur(v, true)}</output>
+          <input id="sl" type="range" min="-300" max="400" step="10" value="${v}" aria-labelledby="q${k}" aria-valuetext="${eur(v, true)}">
+          <div class="ends"><span>−300 €<br>не хватит</span><span style="text-align:right">+400 €<br>с запасом</span></div>
+        </div>
+        <p class="small muted">До 10 очков за прогноз: чем ближе к расчёту, тем больше.</p></div>
+        <div class="btns"><button class="btn" data-a="reveal" data-v="${k}" ${pred == null ? "disabled" : ""}>Показать расчёт</button>
+        <button class="btn link" data-a="skippred" data-v="${k}">Не знаю, покажите сразу</button></div>`;
+    } else {
+      const d = pred == null ? null : Math.abs(pred - fact);
+      const acc = d == null ? badge("slate", "—", "Без прогноза: 0 очков") : d <= 30 ? badge("green", "◎", "Точный глаз: +10 очков") : d <= 60 ? badge("blue", "≈", "Очень близко: +7 очков") : d <= 100 ? badge("blue", "≈", "Близко: +4 очка") : badge("orange", "△", "Далеко: +1 очко");
+      const a = accuracy();
+      const fill = Math.max(0, Math.min(100, (c.rent / D.dsuMonth) * 100));
+      const next = k < 2 ? C[S.cities0[k + 1]] : null;
+      body = `<div class="card" aria-live="polite">
+        <div class="track" aria-hidden="true"><div class="bar"></div><div class="zero" style="left:${pos(0)}%"></div>${pred != null ? `<div class="mk you" style="left:${pos(pred)}%"></div>` : ""}<div class="mk fact" style="left:${pos(fact)}%"></div></div>
+        <div class="legend">${pred != null ? `<span><i style="background:var(--blue)"></i>Ваш прогноз: ${eur(pred, true)}</span>` : ""}<span><i style="background:var(--ink)"></i>Расчёт: ${eur(fact, true)}</span></div>
+        ${acc}
+        <div class="row"><span class="big">${eur(fact, true)}</span><span class="muted small grow">в месяц после комнаты</span></div>
+        <div class="tank" role="img" aria-label="Бак: ${fact < 0 ? "аренда больше стипендии" : "аренда занимает " + Math.round(fill) + "% стипендии"}"><span class="rent" style="width:${fill}%"></span></div>
+        <div class="tank-leg small"><span>аренда ${eur(c.rent)}</span><span>${fact < 0 ? "не хватает " + eur(-fact) : "остаток " + eur(fact)}</span></div>
+        <p class="small">${fact < 0 ? "Комната дороже всей стипендии: не хватает " + eur(-fact) + " в месяц, и это ещё без еды и транспорта." : "На еду, транспорт и всё остальное остаётся " + eur(fact) + " в месяц."}${d != null ? " Ваш промах — " + d + " €." + (a.n > 1 ? " Попаданий ближе 100 €: " + a.hits + " из " + a.n + "." : "") : ""}</p>
+      </div>
+      <div class="card">${dsuBadge(c)}<p class="small">${gl(c.dsuNote)}</p><p class="small muted">${gl(c.note)}</p>
+        <p class="src">Источники: аренда — ${srcLink(c.rentSrc)}, стипендия — ${srcLink(c.dsuSrc)}, минимум DSU — ${srcLink("И7")}</p></div>
+      <button class="btn" data-a="go" data-v="${next ? "money" + (k + 1) : "money_sum"}">${next ? "Следующая заправка: " + esc(next.name) : "Итог заправки"}</button>`;
+    }
+    return `<div class="screen"><div class="stack"><p class="muted small">Заправка ${k + 1} из 3</p><div class="city">${plate(c, true)}<div class="grow"><h1 tabindex="-1" class="nm" style="font-size:28px">${esc(c.name)}</h1><div class="rg">${esc(c.region)}</div></div></div></div>${body}</div>`;
+  }
+  T.money0 = () => moneyScreen(0); T.money1 = () => moneyScreen(1); T.money2 = () => moneyScreen(2);
+
+  T.money_sum = () => {
+    const cs = S.cities0.map((i) => C[i]), covered = cs.filter((c) => bal(c) >= 0).length, a = accuracy();
+    const verdict = covered === 3 ? "Во всех трёх городах стипендии хватает на комнату. Хороший маршрут — если стипендию дадут." : covered === 0 ? "Ни в одном из трёх городов стипендии не хватает даже на комнату. Понадобятся свои деньги или другие стипендии." : "Стипендия покрывает комнату в " + covered + " из 3 городов. Разница между городами — сотни евро в месяц.";
+    return `<div class="screen">
+      <div class="stack"><h1 tabindex="-1">Бак проверен</h1>${lead(verdict)}</div>
+      ${mapSVG({ sel: S.cities0, showBal: true, label: "Баланс по городам маршрута: " + cs.map((c) => c.name + " " + eur(bal(c), true)).join(", ") })}
+      <div class="card"><div class="list">${cs.map((c) => `<div class="li"><span class="plate">${c.code}</span><span class="k">${esc(c.name)}<br>${dsuBadge(c)}</span><span class="num" style="font-size:24px">${eur(bal(c), true)}</span></div>`).join("")}</div></div>
+      <div class="kpis" style="grid-template-columns:1fr 1fr">
+        <div class="kpi"><span class="v">${a.n ? a.avg + " €" : "—"}</span><span class="l">ваш средний промах</span></div>
+        <div class="kpi"><span class="v">${parts().prog} / 30</span><span class="l">очков за прогнозы</span></div>
+      </div>
+      <div class="note">В расчёт не входят еда, транспорт, страховка и плата за учёбу. И стипендию ещё надо получить. Дальше — пропуск: условия, документы и сроки.</div>
+      <button class="btn" data-a="go" data-v="scholar">К пропускному пункту</button>
+    </div>`;
+  };
+
+  T.scholar = () => {
+    const list = relevantSch(), full = S.picks.length >= 3;
+    return `<div class="screen">
+      <div class="stack"><h1 tabindex="-1">Пропускной пункт</h1>${lead("Стипендии открывают дорогу, но у каждой свой шлагбаум: уровень, возраст, гражданство, диплом. Отметьте до трёх, на которые будете подавать. Читайте условия: за внимательность дают до 25 очков.")}</div>
+      ${list.map((s) => {
+        const on = S.picks.includes(s.id);
+        const cities = s.cities.includes("*") ? `<span class="badge slate">Вся Италия</span>` : s.cities.map((code) => `<span class="plate sm">${code}</span>`).join(" ");
+        return `<div class="card sch${on ? " on" : ""}"><div class="row" style="align-items:flex-start"><div class="grow"><h3>${gl(s.name)}</h3><p class="small muted">${gl(s.by)}</p></div><div class="row" style="flex-wrap:wrap;justify-content:flex-end;gap:6px">${cities}</div></div>
+          <p class="small"><b>${gl(s.amount)}</b></p>
+          <p class="small"><span class="muted">Условия:</span> ${gl(s.cond)}</p>
+          <p class="small"><span class="muted">Срок:</span> ${esc(s.deadline)}; следующий ${esc(s.next)} <span class="src">· ${srcLink(s.src)}</span></p>
+          ${opt(on ? "В плане" : "Планирую подавать", "", on, "toggle", s.id, true, (!on && full) ? " disabled" : "")}</div>`;
+      }).join("")}
+      <p class="small muted" aria-live="polite">Выбрано: ${S.picks.length} из 3</p>
+      <button class="btn" data-a="to_docs">${S.picks.length ? "Дальше: документы" : "Пока ни на что — дальше"}</button>
+    </div>`;
+  };
+
+  T.docs = () => {
+    const pk = S.picks.map((id) => SCH.find((s) => s.id === id)).filter(Boolean);
+    return `<div class="screen">
+      <div class="stack"><h1 tabindex="-1">Бардачок с документами</h1>${lead("На границе пропускают по документам. Отметьте, что у вас уже готово: каждый документ — очко.")}</div>
+      ${D.docsReviewed ? "" : `<div class="note">Перечень проверяет и обновляет ${esc(D.contact.name)}. В тестовой версии это рабочий черновик.</div>`}
+      <div class="opts">${D.docs.map((d) => { const tm = termsIn(d.text); return `<div class="docrow"><button class="opt check" data-a="doc" data-v="${d.id}" aria-pressed="${S.docs.includes(d.id)}"><span class="mark" aria-hidden="true">${S.docs.includes(d.id) ? "✓" : ""}</span><span>${esc(d.text)}</span></button>${tm.length ? `<p class="terms">Что это: ${tm.map((t) => `<button class="tl" data-a="info" data-v="${esc(t)}"><span class="tli" aria-hidden="true">i</span>${esc(t)}</button>`).join(" ")}</p>` : ""}</div>`; }).join("")}</div>
+      <p class="small muted" aria-live="polite">Готово: ${S.docs.length} из ${D.docs.length}</p>
+      <div class="card"><h2>Сроки на вашем маршруте</h2>
+        ${pk.length ? `<div class="list">${pk.map((s) => `<div class="li"><span class="k"><b>${esc(s.name)}</b><br><span class="small">Следующий конкурс: ${esc(s.next)}</span><br><span class="small muted">Прошлый срок: ${esc(s.deadline)}</span></span></div>`).join("")}</div>` : `<p class="small muted">${gl("Стипендий в плане нет. Стипендию DSU подают летом в регионе вуза.")}</p>`}
+        <p class="src">Сроки — по последним опубликованным конкурсам; следующие обычно в те же месяцы.</p></div>
+      <div class="note">Документы в бардачке — выезжаем на трассу. Впереди объезды: препятствия, которые вытекают из ваших ответов.</div>
+      <button class="btn" data-a="to_comp">На трассу</button>
+    </div>`;
+  };
+
+  function compScreen(k) {
+    if (!S.comps[k]) { S.comps[k] = buildComp(); save(); }
+    const cp = S.comps[k];
+    if (!cp) return `<div class="screen"><h1 tabindex="-1">Дорога свободна</h1><button class="btn" data-a="go" data-v="choose">К финишу</button></div>`;
+    const done = cp.choice != null;
+    return `<div class="screen">
+      <div class="stack"><p class="muted small">Объезд ${k + 1} из 2</p>${k === 0 && !done ? lead("На трассе всегда что-то случается. Эти препятствия не случайны: они вытекают из ваших ответов и выбора.") : ""}</div>
+      <div class="signal"><div class="stripe" aria-hidden="true">!</div><div class="body">
+        <h1 tabindex="-1" style="font-size:24px">${esc(cp.title)}</h1>
+        <p>${gl(cp.text)}</p>
+        <p class="src">Источник: ${srcLink(cp.src)}</p>
+      </div></div>
+      ${!done ? `<div class="stack"><h2>Куда рулим?</h2><div class="btns">${cp.opts.map((o, i) => `<button class="btn${i ? " sec" : ""}" data-a="choose_opt" data-k="${k}" data-v="${i}">${esc(o.label)}</button>`).join("")}</div><p class="small muted">Правильного ответа нет: важно решить осознанно. +10 очков за пройденный объезд.</p></div>`
+        : `<div class="card" aria-live="polite"><h2>${esc(cp.opts[cp.choice].label)}</h2><p>${gl(cp.opts[cp.choice].out)}</p>${cp.lostNote ? `<p class="small">${esc(cp.lostNote)}</p>` : ""}<p class="small muted"><b>Заметка штурмана:</b> ${gl(cp.lesson)}</p></div>
+        <button class="btn" data-a="go" data-v="${k === 0 ? "comp1" : "choose"}">${k === 0 ? "Дальше по трассе" : "К финишу"}</button>`}
+    </div>`;
+  }
+  T.comp0 = () => compScreen(0); T.comp1 = () => compScreen(1);
+
+  T.choose = () => {
+    const m = mainCity(), cmp = S.compare != null ? C[S.compare] : null, mc = C[m];
+    const diff = cmp ? bal(cmp) - bal(mc) : 0;
+    return `<div class="screen">
+      <div class="stack"><h1 tabindex="-1">Почти финиш</h1>${lead("Какой город станет основным? Остальные останутся запасными в Паспорте.")}</div>
+      <div class="opts">${S.cities.map((i) => { const c = C[i], on = m === i; return `<button class="opt" data-a="main" data-v="${i}" aria-pressed="${on}"><span class="mark" aria-hidden="true">${on ? "✓" : ""}</span><span class="plate">${c.code}</span><span style="flex:1"><b>${esc(c.name)}</b><span class="sub">${eur(bal(c), true)} в месяц · ${lc(DSU_BADGE[c.dsu][2])}</span></span></button>`; }).join("")}</div>
+      <details class="more"${S.compare != null ? " open" : ""}><summary>А если другой город?</summary>
+        <p class="small muted">Сравните основной город с любым из двенадцати.</p>
+        <div class="tiles">${C.map((c, i) => `<button class="tile" data-a="compare" data-v="${i}" aria-pressed="${S.compare === i}" ${i === m ? "disabled" : ""}><span class="plate">${c.code}</span><span>${esc(c.name)}</span></button>`).join("")}</div>
+        ${cmp ? `<div class="card cmp"><div class="list">
+          <div class="li"><span class="k"><b>${esc(mc.name)}</b> · основной</span><span class="num">${eur(bal(mc), true)}</span></div>
+          <div class="li"><span class="k"><b>${esc(cmp.name)}</b><br>${dsuBadge(cmp)}</span><span class="num">${eur(bal(cmp), true)}</span></div></div>
+          <p class="small">${diff > 0 ? "В " + cmp.loc + " в месяц оставалось бы на " + eur(diff) + " больше — это " + eur(diff * 12) + " за год." : diff < 0 ? "В " + cmp.loc + " в месяц оставалось бы на " + eur(-diff) + " меньше — это " + eur(-diff * 12) + " за год." : "Баланс одинаковый."} ${gl(cmp.note)}</p></div>` : ""}
+      </details>
+      <button class="btn" data-a="to_finish">Финишировать</button>
+    </div>`;
+  };
+
+  T.passport = () => {
+    const mi = mainCity(), m = C[mi], others = S.cities.filter((i) => i !== mi).map((i) => C[i]);
+    const pk = S.picks.map((id) => SCH.find((s) => s.id === id)).filter(Boolean);
+    const rk = risks(), a = accuracy(), t = total(), r = rank(t), ps = parts(), bs = badges();
+    return `<div class="screen">
+      <div class="finish">
+        <p class="eyebrow">Финиш</p>
+        <h1 tabindex="-1">${nm() ? esc(nm()) + ", маршрут проложен" : "Маршрут проложен"}</h1>
+        <div class="rankrow"><span class="bignum">${t}</span><span class="small">${plural(t, "очко", "очка", "очков")} из 100<br><b class="rank">${esc(r.name)}</b></span></div>
+        ${r.next ? `<p class="small">До звания «${esc(rank(r.next).name)}» не хватило ${r.next - t} ${plural(r.next - t, "очка", "очков", "очков")}.</p>` : `<p class="small">Высшее звание. Так держать.</p>`}
+        <div class="parts">${Object.keys(MAXS).map((k) => `<div class="part"><span class="pn">${PART_NAMES[k]}</span><span class="pbar"><i style="width:${(ps[k] / MAXS[k]) * 100}%"></i></span><span class="pv">${ps[k]}/${MAXS[k]}</span></div>`).join("")}</div>
+        <div class="badges">${bs.map((b) => `<div class="bdg${b.got ? " got" : ""}"><span class="bi" aria-hidden="true">${b.icon}</span><span><b>${esc(b.name)}</b><span class="sub">${b.got ? "получен" : esc(b.how)}</span></span></div>`).join("")}</div>
+      </div>
+
+      <div class="passport" id="passport">
+        <div class="hd"><h2 style="font-size:24px">Паспорт маршрута</h2><span class="small muted">${esc(nm() || "Штурман")}</span></div>
+        ${mapSVG({ sel: S.cities, main: mi, showBal: true, label: "Схема маршрута: " + S.cities.map((i) => C[i].name).join(", ") })}
+        <div class="city">${plate(m, true)}<div class="grow"><div class="nm">${esc(m.name)}</div><div class="rg">основной город · ${esc(m.region)}</div></div><span class="big" style="font-size:34px">${eur(bal(m), true)}</span></div>
+        <p class="small muted">${gl("в месяц: стипендия DSU 597,59 € минус комната " + eur(m.rent))}</p>
+        ${dsuBadge(m)}
+        ${others.length ? `<div class="sec"><h3>Запасные</h3><div class="list">${others.map((c) => `<div class="li"><span class="plate">${c.code}</span><span class="k">${esc(c.name)}</span><span class="num">${eur(bal(c), true)}</span></div>`).join("")}</div></div>` : ""}
+        <div class="sec"><h3>Стипендии в плане</h3>${pk.length ? `<div class="list">${pk.map((s) => { const e = elig(s), b = ELIG_BADGE[e.st]; return `<div class="li"><span class="k"><b>${esc(s.name)}</b><br><span class="small muted">${esc(s.amount)} · следующий конкурс ${esc(s.next)}</span><br>${badge(b[0], b[1], b[2])}</span></div>`; }).join("")}</div>` : `<p class="small muted">Пока нет. Основной источник — стипендия DSU.</p>`}</div>
+        ${rk.length ? `<div class="sec"><h3>Риски и шаги</h3><div class="list">${rk.map((x) => `<div class="li"><span aria-hidden="true">△</span><span class="k small">${esc(x)}</span></div>`).join("")}</div></div>` : ""}
+        <div class="sec"><h3>Документы</h3><p class="small">Готово ${S.docs.length} из ${D.docs.length}.</p></div>
+        ${a.n ? `<div class="sec"><h3>Точность прогноза</h3><p class="small">Средний промах ${a.avg} € · попаданий ближе 100 €: ${a.hits} из ${a.n}</p></div>` : ""}
+        <p class="src">Цифры — ориентир по данным на ${D.checkedAt}, без еды, транспорта и страховки.</p>
+      </div>
+
+      <div class="card">
+        <h2>Пара вопросов на прощание</h2>
+        <div class="stack"><h3>Теперь вы увереннее в выборе города?</h3>${scale("conf1", S.conf1, "совсем не уверен(а)", "точно знаю")}</div>
+        <div class="stack"><h3>Насколько игра была полезной?</h3>${scale("useful", S.useful, "бесполезно", "очень полезно")}</div>
+        <div class="stack"><label for="cm"><h3>Что было непонятно или чего не хватило?</h3></label><textarea id="cm" maxlength="300" placeholder="Необязательно, но пара слов поможет сделать игру лучше">${esc(S.comment)}</textarea>${TR.on ? `<p class="small muted">Комментарий уйдёт команде игры без имени и ника.</p>` : ""}</div>
+      </div>
+
+      <div class="card send">
+        <h2>Обсудите маршрут с ${esc(D.contact.nameWith)}</h2>
+        <p class="small">Андрей живёт в Италии и помогает выбрать город и подготовить подачу. Нажмите кнопку: откроется чат с ним, а Паспорт уже будет в сообщении. Если текст не подставился, просто вставьте его — мы скопировали его заранее.</p>
+        <div class="btns">
+          <a class="btn" data-a="sendtg" id="l-tg" href="${esc(tgHref())}" target="_blank" rel="noopener">Отправить Андрею в Telegram</a>
+          <a class="btn sec" data-a="sendwa" id="l-wa" href="${esc(waHref())}" target="_blank" rel="noopener">Отправить в WhatsApp</a>
+          <button class="btn sec" data-a="pdf">Сохранить Паспорт в PDF</button>
+          <button class="btn link" data-a="copy">Скопировать текст Паспорта</button>
+        </div>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+        <p class="src">Имя и ник увидит только тот, кому вы сами отправите сообщение. В конце текста — код сессии: по нему мы улучшаем игру.</p>
+      </div>
+
+      <div class="card"><h2>Позвать с собой друга</h2><p class="small">Если кто-то из знакомых тоже думает об Италии, отправьте ему игру.</p>
+        <div class="row"><a class="btn sec" data-a="friend" data-v="tg" href="${esc(tgShareHref())}" target="_blank" rel="noopener">Telegram</a><a class="btn sec" data-a="friend" data-v="wa" href="${esc(waShareHref())}" target="_blank" rel="noopener">WhatsApp</a></div></div>
+      <button class="btn link" data-a="restart">Проложить другой маршрут</button>
+      <details class="more"><summary>Все источники</summary><div class="list">${Object.keys(D.sources).map((k) => `<div class="li small"><span class="num">${k}</span><span class="k"><a href="${esc(D.sources[k][1])}" target="_blank" rel="noopener">${esc(D.sources[k][0])}</a></span></div>`).join("")}</div></details>
+    </div>`;
+  };
+
+  /* ---------- PDF ---------- */
+  function wrap(ctx, text, maxW) {
+    const words = String(text).split(/\s+/), lines = []; let line = "";
+    words.forEach((w) => { const tt = line ? line + " " + w : w; if (ctx.measureText(tt).width > maxW && line) { lines.push(line); line = w; } else line = tt; });
+    if (line) lines.push(line); return lines;
+  }
+  async function drawPassport() {
+    try { if (document.fonts) await Promise.all(["700 40px 'Fira Sans Condensed'", "400 24px 'Fira Sans'", "600 24px 'Fira Sans'"].map((f) => document.fonts.load(f))); } catch (e) { }
+    const W = 1240, H = 1754, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    const g = cv.getContext("2d");
+    const HF = "'Fira Sans Condensed', 'Arial Narrow', Arial, sans-serif", BF = "'Fira Sans', Arial, sans-serif";
+    const ink = "#141A1F", ink2 = "#46525C", blue = "#0B5AA6", line = "#CBD3D9", paper = "#F8FAFB";
+    g.fillStyle = paper; g.fillRect(0, 0, W, H);
+    g.fillStyle = blue; g.fillRect(0, 0, W, 170);
+    g.fillStyle = paper; g.font = "700 64px " + HF; g.fillText("ШТУРМАН", 80, 100);
+    g.font = "400 30px " + BF; g.fillText("Паспорт маршрута" + (nm() ? " · " + nm() : ""), 80, 145);
+    g.textAlign = "right"; g.font = "400 26px " + BF; g.fillText(new Date().toLocaleDateString("ru-RU"), W - 80, 100); g.textAlign = "left";
+    const mx = 760, my = 210, sc = 1.1;
+    g.save(); g.translate(mx, my); g.scale(sc, sc);
+    g.fillStyle = "#DCE9F5"; g.fillRect(0, 0, 370, 415);
+    g.fillStyle = "#FFFFFF"; g.strokeStyle = line; g.lineWidth = 1.5;
+    D.outline.forEach((poly) => { g.beginPath(); poly.forEach(([lo, la], i) => (i ? g.lineTo(PX(lo), PY(la)) : g.moveTo(PX(lo), PY(la)))); g.closePath(); g.fill(); g.stroke(); });
+    const mi = mainCity(), sel = S.cities.slice().sort((a, b) => C[b].lat - C[a].lat);
+    g.strokeStyle = blue; g.lineWidth = 3; g.setLineDash([6, 5]); g.beginPath(); sel.forEach((i, k) => (k ? g.lineTo(PX(C[i].lon), PY(C[i].lat)) : g.moveTo(PX(C[i].lon), PY(C[i].lat)))); g.stroke(); g.setLineDash([]);
+    C.forEach((c, i) => {
+      const on = S.cities.includes(i), px = PX(c.lon) + c.lx, py = PY(c.lat) + c.ly;
+      g.fillStyle = on ? ink : "#8A96A0"; g.beginPath(); g.arc(PX(c.lon), PY(c.lat), on ? 4.5 : 3, 0, 7); g.fill();
+      g.fillStyle = on ? blue : "#FFFFFF"; g.strokeStyle = i === mi ? "#F2C200" : on ? "#FFFFFF" : line; g.lineWidth = i === mi ? 3 : 1.2;
+      g.beginPath(); if (g.roundRect) g.roundRect(px, py, 34, 22, 4); else g.rect(px, py, 34, 22); g.fill(); g.stroke();
+      g.fillStyle = on ? paper : ink2; g.font = "700 13px " + HF; g.textAlign = "center"; g.fillText(c.code, px + 17, py + 15.5); g.textAlign = "left";
+    });
+    g.restore();
+    const m = C[mi]; let y = 240;
+    g.fillStyle = ink2; g.font = "600 24px " + BF; g.fillText("ОСНОВНОЙ ГОРОД", 80, y); y += 22;
+    g.fillStyle = blue; g.fillRect(80, y, 110, 74); g.fillStyle = paper; g.font = "700 44px " + HF; g.textAlign = "center"; g.fillText(m.code, 135, y + 53); g.textAlign = "left";
+    g.fillStyle = ink; g.font = "700 52px " + HF; g.fillText(m.name, 214, y + 42); g.fillStyle = ink2; g.font = "400 24px " + BF; g.fillText(m.region, 214, y + 72);
+    y += 170; g.fillStyle = ink; g.font = "700 96px " + HF; g.fillText(eur(bal(m), true), 80, y);
+    y += 44; g.fillStyle = ink2; g.font = "400 24px " + BF;
+    wrap(g, "в месяц: стипендия DSU 597,59 € минус комната " + eur(m.rent), 620).forEach((l) => { g.fillText(l, 80, y); y += 32; });
+    g.fillStyle = m.dsu === "g" ? "#0F6B3B" : m.dsu === "d" ? "#55626D" : "#9E3A0A"; g.font = "600 26px " + BF; g.fillText(DSU_BADGE[m.dsu][1] + " " + DSU_BADGE[m.dsu][2], 80, y + 8);
+    y = Math.max(y + 70, 740);
+    const sect = (title, items) => {
+      if (y > H - 320) return;
+      g.fillStyle = ink2; g.font = "600 22px " + BF; g.fillText(title.toUpperCase(), 80, y); y += 12; g.strokeStyle = line; g.lineWidth = 2; g.beginPath(); g.moveTo(80, y); g.lineTo(W - 80, y); g.stroke(); y += 38;
+      g.fillStyle = ink; g.font = "400 26px " + BF;
+      items.forEach((it) => { wrap(g, it, W - 200).forEach((l, li) => { if (y < H - 240) { g.fillText((li ? "   " : "— ") + l, 80, y); y += 34; } }); });
+      y += 20;
+    };
+    const others = S.cities.filter((i) => i !== mi).map((i) => C[i]);
+    if (others.length) sect("Запасные города", others.map((c) => c.name + ": " + eur(bal(c), true) + " в месяц, " + lc(DSU_BADGE[c.dsu][2])));
+    const pk = S.picks.map((id) => SCH.find((s) => s.id === id)).filter(Boolean);
+    sect("Стипендии в плане", pk.length ? pk.map((s) => s.name + ": " + s.amount + "; следующий конкурс " + s.next + " (" + lc(ELIG_BADGE[elig(s).st][2]) + ")") : ["пока нет — основной источник стипендия DSU"]);
+    const rk = risks(); if (rk.length) sect("Риски и шаги", rk);
+    const t = total();
+    sect("Итог игры", ["Документы: готово " + S.docs.length + " из " + D.docs.length, "Очки штурмана: " + t + " из 100 · " + rank(t).name]);
+    g.fillStyle = blue; g.fillRect(0, H - 190, W, 190);
+    g.fillStyle = paper; g.font = "700 34px " + HF; g.fillText("Обсудить маршрут: " + D.contact.name + " · t.me/" + D.contact.tg, 80, H - 122);
+    g.font = "400 22px " + BF; g.fillText("Код сессии: " + sessionCode(), 80, H - 76); g.fillText("Цифры — ориентир по данным на " + D.checkedAt + ", без еды, транспорта и страховки", 80, H - 42);
+    return cv;
+  }
+  function pdfFromJpeg(jpeg, w, h) {
+    const te = new TextEncoder(), chunks = [], offs = []; let len = 0;
+    const push = (d) => { const b = typeof d === "string" ? te.encode(d) : d; chunks.push(b); len += b.length; };
+    const obj = (n, body) => { offs[n] = len; push(n + " 0 obj\n"); body(); push("\nendobj\n"); };
+    const pw = 595.28, ph = 841.89, content = "q " + pw + " 0 0 " + ph + " 0 0 cm /Im0 Do Q";
+    push("%PDF-1.4\n");
+    obj(1, () => push("<< /Type /Catalog /Pages 2 0 R >>"));
+    obj(2, () => push("<< /Type /Pages /Kids [3 0 R] /Count 1 >>"));
+    obj(3, () => push("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + pw + " " + ph + "] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>"));
+    obj(4, () => { push("<< /Type /XObject /Subtype /Image /Width " + w + " /Height " + h + " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " + jpeg.length + " >>\nstream\n"); push(jpeg); push("\nendstream"); });
+    obj(5, () => push("<< /Length " + content.length + " >>\nstream\n" + content + "\nendstream"));
+    const xref = len;
+    let xr = "xref\n0 6\n0000000000 65535 f \n"; for (let i = 1; i <= 5; i++) xr += String(offs[i]).padStart(10, "0") + " 00000 n \n";
+    push(xr + "trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
+    const out = new Uint8Array(len); let p = 0; chunks.forEach((c) => { out.set(c, p); p += c.length; }); return out;
+  }
+  let dlPromise = null;
+  function downloads() { if (!dlPromise) dlPromise = (window.claude && window.claude.use) ? window.claude.use("downloads").catch(() => null) : Promise.resolve(null); return dlPromise; }
+  async function savePdf() {
+    const toast = document.getElementById("toast");
+    if (toast) toast.textContent = "Готовим PDF…";
+    const cv = await drawPassport();
+    const url = cv.toDataURL("image/jpeg", 0.9), bin = atob(url.split(",")[1]), bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const pdf = pdfFromJpeg(bytes, cv.width, cv.height);
+    window.__lastPdf = pdf;
+    const dl = await downloads();
+    if (dl) {
+      try { await dl.save({ filename: "Штурман — паспорт маршрута.pdf", data: new Blob([pdf], { type: "application/pdf" }) }); if (toast) toast.textContent = "PDF сохранён."; return; }
+      catch (e) { if (e && (e.code === "declined" || e.code === "rate_limited")) { if (toast) toast.textContent = e.code === "declined" ? "Сохранение отменено." : "Подождите пару секунд и попробуйте снова."; return; } }
+    }
+    if (!window.claude) {
+      try {
+        const u = URL.createObjectURL(new Blob([pdf], { type: "application/pdf" })), a = document.createElement("a");
+        a.href = u; a.download = "Штурман — паспорт маршрута.pdf"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 8000);
+        if (toast) toast.textContent = "Готово, проверьте загрузки. Файла нет? Нажмите ещё раз или скопируйте текст Паспорта.";
+        return;
+      } catch (e) { /* ниже запасной вариант — картинка */ }
+    }
+    if (toast) toast.textContent = "";
+    openSheet("Сохраните Паспорт картинкой", `<p class="small">Здесь браузер не даёт скачать файл. Нажмите на картинку и удерживайте (на компьютере — правая кнопка мыши) и выберите «Сохранить изображение».</p><img class="pimg" src="${url}" alt="Паспорт маршрута">`);
+  }
+
+  /* ---------- шторка: пояснения и карточки городов ---------- */
+  const sheetRoot = document.getElementById("sheet-root");
+  let sheetReturn = null;
+  function openSheet(title, html) {
+    sheetReturn = document.activeElement;
+    sheetRoot.innerHTML = `<div class="scrim" data-a="sheetclose"></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t"><div class="sheet-hd"><h2 id="sh-t">${esc(title)}</h2><button class="x" data-a="sheetclose" aria-label="Закрыть">✕</button></div><div class="sheet-bd">${html}</div></div>`;
+    sheetRoot.hidden = false;
+    const xb = sheetRoot.querySelector(".x"); if (xb) xb.focus();
+  }
+  function closeSheet() { sheetRoot.hidden = true; sheetRoot.innerHTML = ""; if (sheetReturn && sheetReturn.focus) sheetReturn.focus(); }
+  sheetRoot.addEventListener("click", (e) => { const el = e.target.closest("[data-a]"); if (el && el.dataset.a === "sheetclose") closeSheet(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !sheetRoot.hidden) closeSheet();
+    if ((e.key === "Enter" || e.key === " ") && e.target.getAttribute && e.target.getAttribute("role") === "button" && e.target.dataset && e.target.dataset.a && e.target.tagName.toLowerCase() !== "button") { e.preventDefault(); e.target.dispatchEvent(new MouseEvent("click", { bubbles: true })); }
+  });
+  function cityInfo(i) {
+    const c = C[i], moneyDone = S.revealed.every(Boolean) || (SCREEN_ST[S.screen] || 0) >= 3;
+    seen = new Set();
+    return `<div class="city">${plate(c, true)}<div class="grow"><div class="nm">${esc(c.name)}</div><div class="rg">${esc(c.region)} · ${esc(c.size.toLowerCase())}</div></div></div>
+      <div class="list">
+        <div class="li"><span class="k muted">Вузы</span><span class="r">${esc(c.unis)}</span></div>
+        <div class="li"><span class="k muted">Сильные направления</span><span class="r">${esc(c.strong)}</span></div>
+        <div class="li"><span class="k muted">Программы на английском</span><span class="r"><span aria-hidden="true">${"●".repeat(c.eng)}${"○".repeat(5 - c.eng)}</span><span class="sr">${c.eng} из 5</span></span></div>
+        ${moneyDone ? `<div class="li"><span class="k muted">Комната</span><span class="r">${eur(c.rent)} в месяц</span></div><div class="li"><span class="k muted">Баланс</span><span class="r num">${eur(bal(c), true)}</span></div>` : `<div class="li"><span class="k muted">Деньги</span><span class="r">посчитаем на заправке</span></div>`}
+      </div>
+      ${moneyDone ? dsuBadge(c) : ""}
+      <p class="small muted">${gl(c.note)}</p><p class="src">Оценка английских программ — мнение эксперта.</p>`;
+  }
+
+  /* ---------- отрисовка ---------- */
+  const root = document.getElementById("app");
+  const chip = document.getElementById("chip");
+  let lastScore = 0, chipT = null;
+  function render(moveFocus) {
+    seen = new Set();
+    const fn = T[S.screen] || T.intro;
+    const body = fn();
+    root.innerHTML = header() + body;
+    save(); TR.screen(); TR.end();
+    if (moveFocus) { window.scrollTo(0, 0); const h = root.querySelector("h1[tabindex]"); if (h) h.focus({ preventScroll: true }); }
+    const sl = document.getElementById("sl"); if (sl) sl.addEventListener("input", onSlide);
+    const cm = document.getElementById("cm"); if (cm) cm.addEventListener("input", () => { S.comment = cm.value.slice(0, 300); save(); refreshLinks(); TR.end(); });
+    const nmI = document.getElementById("nm"), nkI = document.getElementById("nk");
+    if (nmI) nmI.addEventListener("input", () => { S.name = nmI.value.slice(0, 40); save(); const b = root.querySelector('[data-a="hello_next"]'); if (b) b.disabled = !nm(); });
+    if (nkI) nkI.addEventListener("input", () => { S.nick = nkI.value.slice(0, 40); save(); });
+    const t = total();
+    if (t > lastScore && SCREEN_ST[S.screen]) flashScore(t - lastScore);
+    lastScore = t;
+  }
+  function refreshLinks() { const a = document.getElementById("l-tg"), b = document.getElementById("l-wa"); if (a) a.href = tgHref(); if (b) b.href = waHref(); }
+  function flashScore(d) { chip.textContent = "+" + d + " " + plural(d, "очко", "очка", "очков") + " штурмана"; chip.hidden = false; clearTimeout(chipT); chipT = setTimeout(() => { chip.hidden = true; }, 1800); }
+  function onSlide(e) {
+    const k = ["money0", "money1", "money2"].indexOf(S.screen); if (k < 0) return;
+    const v = Number(e.target.value); S.preds[k] = v;
+    e.target.setAttribute("aria-valuetext", eur(v, true));
+    const pv = document.getElementById("pv"); if (pv) pv.textContent = eur(v, true);
+    const b = root.querySelector('[data-a="reveal"]'); if (b) b.disabled = false;
+    save();
+  }
+  function resetRoute() { S.cities0 = suggest(); S.cities = S.cities0.slice(); S.preds = [null, null, null]; S.revealed = [false, false, false]; S.comps = []; S.main = null; S.compare = null; S.condScored = false; }
+  function copyText(text, okMsg, quiet) {
+    const toast = document.getElementById("toast");
+    const fail = () => { if (quiet) return; openSheet("Скопируйте текст", `<textarea class="copybox" readonly>${esc(text)}</textarea><p class="small muted">Выделите текст и скопируйте его.</p>`); const ta = sheetRoot.querySelector("textarea"); if (ta) { ta.focus(); ta.select(); } };
+    try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => { if (toast && okMsg) toast.textContent = okMsg; }, fail); else fail(); } catch (e) { fail(); }
+  }
+
+  root.addEventListener("click", (e) => {
+    const el = e.target.closest("[data-a]"); if (!el || el.disabled) return;
+    const a = el.dataset.a, v = el.dataset.v, k = el.dataset.k;
+    if (a === "back") return back();
+    if (a === "go") return go(v);
+    if (a === "info") { e.preventDefault(); e.stopPropagation(); if (!S.infoSeen.includes(v)) { S.infoSeen.push(v); S.infoOpens++; save(); } openSheet(v, `<p>${esc(D.glossary[v] || "")}</p>`); return; }
+    if (a === "cityinfo") { const i = Number(v); openSheet(C[i].name, cityInfo(i)); return; }
+    if (a === "start") { const ch = S.channel, sid = S.sid; clearSaved(); S = fresh(); S.channel = ch; S.sid = sid; lastScore = 0; return go("hello"); }
+    if (a === "resume") { const o = load(); if (o) { const ch = S.channel; S = o; if (!S.sid) S.sid = rid(); if (ch !== "direct") S.channel = ch; } lastScore = total(); TR.mark("resume"); return render(true); }
+    if (a === "restart") { const ch = S.channel, n0 = S.name, k0 = S.nick; clearSaved(); S = fresh(); S.channel = ch; S.name = n0; S.nick = k0; lastScore = 0; TR.mark("again"); return go("q_level"); }
+    if (a === "hello_next") { if (!nm()) return; return go("q_level"); }
+    if (a === "scale") {
+      S[k] = Number(v); save();
+      root.querySelectorAll(`[data-a="scale"][data-k="${k}"]`).forEach((b) => b.setAttribute("aria-pressed", b.dataset.v === v ? "true" : "false"));
+      refreshLinks(); TR.end(); return;
+    }
+    if (a === "pick") { const [key, raw] = v.split(":"); S[key] = ["age", "prio"].includes(key) ? Number(raw) : raw; save(); return render(false); }
+    if (a === "qnext") { const i = QS.indexOf(S.screen); if (i === 4) resetRoute(); save(); return go(i < 4 ? QS[i + 1] : "scout"); }
+    if (a === "swap") { S.swapping = S.swapping === Number(v) ? null : Number(v); return render(false); }
+    if (a === "swapto") { const i = Number(v), kk = Number(k); S.cities0[kk] = i; S.cities = S.cities0.slice(); S.preds[kk] = null; S.revealed[kk] = false; S.comps = []; S.main = null; S.swapping = null; save(); return render(false); }
+    if (a === "reveal") { S.revealed[Number(v)] = true; save(); return render(false); }
+    if (a === "skippred") { const kk = Number(v); S.preds[kk] = null; S.revealed[kk] = true; save(); return render(false); }
+    if (a === "toggle") { if (S.picks.includes(v)) S.picks = S.picks.filter((x) => x !== v); else if (S.picks.length < 3) S.picks.push(v); save(); return render(false); }
+    if (a === "to_docs") { S.picksAtSubmit = S.picks.length; S.closedAtSubmit = S.picks.filter((id) => elig(SCH.find((s) => s.id === id)).st === "closed").length; S.comps = []; S.condScored = false; save(); return go("docs"); }
+    if (a === "to_comp") { S.condScored = true; return go("comp0"); }
+    if (a === "doc") { if (S.docs.includes(v)) S.docs = S.docs.filter((x) => x !== v); else S.docs.push(v); save(); return render(false); }
+    if (a === "choose_opt") { applyChoice(Number(k), Number(v)); save(); return render(false); }
+    if (a === "main") { S.main = Number(v); save(); return render(false); }
+    if (a === "compare") { S.compare = Number(v); save(); return render(false); }
+    if (a === "to_finish") { if (S.main == null) S.main = mainCity(); S.finished = true; return go("passport"); }
+    if (a === "copy") { TR.via("copy"); copyText(passportText(), "Текст Паспорта скопирован."); return; }
+    if (a === "sendtg") { TR.via("tg"); copyText(messageText(), "Открываем чат с Андреем. Текст уже в буфере обмена — если он не подставился, вставьте его.", true); return; }
+    if (a === "sendwa") { TR.via("wa"); copyText(passportText(), "Открываем WhatsApp. Текст уже в буфере обмена.", true); return; }
+    if (a === "pdf") { TR.via("pdf"); savePdf(); return; }
+    if (a === "friend") { TR.via("friend_" + v); return; }
+  });
+
+  /* ---------- старт ---------- */
+  let qUtm = ""; try { qUtm = new URLSearchParams(location.search).get("utm_source") || ""; } catch (e) { }
+  const chStart = chClean(CFG.ch != null ? CFG.ch : location.hash) || chClean(CFG.utm) || chClean(qUtm);
+  if (chStart) S.channel = chStart;
+  render(false);
+  TR.open();
+  downloads();
+  window.__shturman = { get state() { return S; }, sessionCode, passportText, messageText, elig, suggest, total, parts, drawPassport, pdfFromJpeg, savePdf, badges };
+})();
+
+</script>
+</body></html>
